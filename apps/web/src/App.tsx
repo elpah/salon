@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Theme } from './settings/types';
 import Navbar from './components/Navbar';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Homepage from './pages/Homepage';
 import Footer from './components/Footer';
 const About = lazy(() => import('./pages/About'));
@@ -13,6 +13,14 @@ const BookAppointment = lazy(() => import('./pages/BookAppointment'));
 let theme: Theme = 'light';
 
 function App() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, [pathname]);
+
   function setTheme(theme: Theme) {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');

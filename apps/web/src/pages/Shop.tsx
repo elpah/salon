@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import { PRODUCTS } from "@salon/data";
+import { useState } from 'react';
+import { PRODUCTS } from '@salon/data';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star } from 'lucide-react';
 
 const Shop = () => {
+  const [activeCategory, setActiveCategory] = useState<'all' | 'wigs' | 'equipment' | 'care'>(
+    'all'
+  );
+  const filteredProducts =
+    activeCategory === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeCategory);
 
-	const [activeCategory, setActiveCategory] = useState<'all' | 'wigs' | 'equipment' | 'care'>(
-		'all'
-	  );
-	  const filteredProducts =
-		activeCategory === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeCategory);
-	
   return (
     <div className="pt-24 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,6 +78,6 @@ const Shop = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Shop
+export default Shop;

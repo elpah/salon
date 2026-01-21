@@ -1,7 +1,7 @@
 import { Scissors, Instagram, Facebook, Twitter, MapPin, Phone, Clock } from 'lucide-react';
+import { SiTiktok } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
-import { NAV_LINKS } from './Navbar'; // Make sure Navbar exports NAV_LINKS
-import React from 'react';
+import { NAV_LINKS } from './Navbar';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -19,13 +19,14 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-sm leading-relaxed">
-              Redefining beauty through precision, care, and the latest in hair technology. Visit our
-              flagship salon for a transformation.
+              Redefining beauty through precision, care, and the latest in hair technology. Visit
+              our flagship salon for a transformation.
             </p>
             <div className="flex space-x-4">
               <Instagram className="h-5 w-5 hover:text-rose-500 cursor-pointer" />
               <Facebook className="h-5 w-5 hover:text-rose-500 cursor-pointer" />
               <Twitter className="h-5 w-5 hover:text-rose-500 cursor-pointer" />
+              <SiTiktok className="h-5 w-5 hover:text-rose-500 cursor-pointer" />
             </div>
           </div>
 

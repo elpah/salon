@@ -41,10 +41,12 @@ const Navbar = () => {
         <div className=" flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => handleNavClick('/')}>
-            <Scissors className={`h-8 w-8 ${isScrolled ? 'text-rose-600' : 'text-white'}`} />
+            <Scissors
+              className={`h-8 w-8 ${location.pathname !== '/' || isScrolled ? 'text-rose-600' : 'text-white'}`}
+            />
             <span
               className={`ml-2 text-2xl font-serif font-bold tracking-tight ${
-                isScrolled ? 'text-slate-900' : 'text-white'
+                location.pathname !== '/' || isScrolled ? 'text-slate-900' : 'text-white'
               }`}
             >
               Professional Hair Stylist
@@ -62,9 +64,11 @@ const Navbar = () => {
                     ? isScrolled
                       ? 'text-rose-600'
                       : 'text-rose-400'
-                    : isScrolled
-                      ? 'text-slate-600 hover:text-rose-600'
-                      : 'text-slate-100 hover:text-white'
+                    : location.pathname === '/'
+                      ? isScrolled
+                        ? 'text-slate-600 hover:text-rose-600'
+                        : 'text-slate-100 hover:text-white'
+                      : 'text-slate-600 hover:text-rose-600'
                 }`}
               >
                 {link.name}
@@ -74,7 +78,7 @@ const Navbar = () => {
             <button
               onClick={() => handleNavClick('/book-appointment')}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
-                isScrolled
+                location.pathname !== '/' || isScrolled
                   ? 'bg-rose-600 text-white hover:bg-rose-700'
                   : 'bg-white text-rose-600 hover:bg-rose-50'
               }`}
