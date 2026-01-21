@@ -1,4 +1,4 @@
-import { SERVICES } from '@/data.tsx/services.data';
+import { SERVICES } from "@salon/data";
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, Star, CheckCircle, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

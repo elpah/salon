@@ -12,6 +12,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@salon/data": "^1.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.542.0",

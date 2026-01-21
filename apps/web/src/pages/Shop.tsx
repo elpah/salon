@@ -1,7 +1,7 @@
-import { PRODUCTS } from '@/data.tsx/products.data';
+import { useState } from 'react'
+import { PRODUCTS } from "@salon/data";
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star } from 'lucide-react';
-import React, { useState } from 'react'
 
 const Shop = () => {
 

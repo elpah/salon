@@ -1,4 +1,4 @@
-import { SERVICES } from '@/data.tsx/services.data';
+import { SERVICES } from "@salon/data";
 import { Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
