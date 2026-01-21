@@ -25,7 +25,20 @@ function App() {
 
   return (
     <div className="app-container">
-
+      <Navbar />
+      <div className="content">
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/book-appointment" element={<BookAppointment />} />
+          </Routes>
+        </Suspense>
+      </div>
+      <Footer />
     </div>
   );
 }
