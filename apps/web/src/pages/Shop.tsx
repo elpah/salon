@@ -20,12 +20,12 @@ const Shop = () => {
               Elevate your home hair routine with our professional selection.
             </p>
           </div>
-          <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg">
+          <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
             {['all', 'wigs', 'equipment', 'care'].map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat as any)}
-                className={`px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === cat ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-2 sm:px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === cat ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 {cat}
               </button>

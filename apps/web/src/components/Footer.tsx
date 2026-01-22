@@ -51,7 +51,7 @@ const Footer = () => {
             <h4 className="text-white font-semibold mb-6">Contact Us</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center">
-                <MapPin className="h-4 w-4 mr-2 text-rose-500" /> 123 Glamour St, New York
+                <MapPin className="h-4 w-4 mr-2 text-rose-500" /> 123 Rotterdam Street
               </li>
               <li className="flex items-center">
                 <Phone className="h-4 w-4 mr-2 text-rose-500" /> (555) 123-4567

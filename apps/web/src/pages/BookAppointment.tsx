@@ -1,18 +1,59 @@
-import { SERVICES } from "@/data.tsx/services.data";
-import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { useState } from "react";
-
+import { SERVICES } from '@salon/data';
+import { motion } from 'framer-motion';
+import { CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 const BookAppointment = () => {
-	  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const dates = ['Mon, Oct 23', 'Tue, Oct 24', 'Wed, Oct 25', 'Thu, Oct 26', 'Fri, Oct 27'];
-  const times = ['09:00 AM', '10:30 AM', '01:00 PM', '02:30 PM', '04:00 PM', '05:30 PM'];
+  const [clientDetails, setClientDetails] = useState({
+    name: '',
+    email: '',
+    phone: '',
+  });
 
+  const availableSlots = [
+    {
+      date: '2024-01-19',
+      times: ['10:00 AM - 11:00 AM', '1:00 PM - 2:00 PM', '2:30 PM - 3:30 PM', '4:00 PM - 5:00 PM'],
+    },
+    {
+      date: '2024-01-20',
+      times: [
+        '9:00 AM - 10:00 AM',
+        '11:30 AM - 12:30 PM',
+        '2:00 PM - 3:00 PM',
+        '5:00 PM - 6:00 PM',
+      ],
+    },
+    {
+      date: '2024-01-21',
+      times: ['10:00 AM - 11:00 AM', '1:30 PM - 2:30 PM', '3:00 PM - 4:00 PM'],
+    },
+    {
+      date: '2024-01-22',
+      times: ['9:30 AM - 10:30 AM', '12:00 PM - 1:00 PM', '3:30 PM - 4:30 PM', '5:30 PM - 6:30 PM'],
+    },
+    {
+      date: '2024-01-23',
+      times: ['10:00 AM - 11:00 AM', '2:00 PM - 3:00 PM', '4:00 PM - 5:00 PM'],
+    },
+  ]; // I will fetch this data from a backend; add booked key with value yes/no to distinguish between available and unavalable slots. 
+  const selectedSlot = availableSlots.find(slot => slot.date === selectedDate);
+  const availableTimes = selectedSlot ? selectedSlot.times : [];
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // @return
   return (
-	   <div className="pt-24 pb-24 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-24 bg-slate-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="bg-slate-900 p-8 md:p-12 text-white">
@@ -20,14 +61,14 @@ const BookAppointment = () => {
             <p className="text-slate-400 text-sm">Secure your appointment in just a few clicks.</p>
 
             <div className="flex mt-8 space-x-4">
-              {[1, 2, 3].map(s => (
+              {[1, 2, 3, 4].map(s => (
                 <div key={s} className="flex items-center">
                   <div
                     className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${step >= s ? 'bg-rose-600 border-rose-600' : 'bg-transparent border-slate-700 text-slate-600'}`}
                   >
                     {s}
                   </div>
-                  {s < 3 && (
+                  {s < 4 && (
                     <div
                       className={`w-12 h-0.5 ml-4 ${step > s ? 'bg-rose-600' : 'bg-slate-700'}`}
                     />
@@ -93,37 +134,42 @@ const BookAppointment = () => {
                 <h3 className="text-xl font-bold mb-6">Choose Date & Time</h3>
                 <div className="mb-8">
                   <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
-                    Available Dates
+                    Select a Date
                   </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                    {dates.map(date => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {availableSlots.map(slot => (
                       <button
-                        key={date}
-                        onClick={() => setSelectedDate(date)}
-                        className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${selectedDate === date ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
+                        key={slot.date}
+                        onClick={() => {
+                          setSelectedDate(slot.date);
+                          setSelectedTime('');
+                        }}
+                        className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${selectedDate === slot.date ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
                       >
-                        {date}
+                        {formatDate(slot.date)}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="mb-8">
-                  <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
-                    Available Times
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {times.map(time => (
-                      <button
-                        key={time}
-                        onClick={() => setSelectedTime(time)}
-                        className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${selectedTime === time ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
-                      >
-                        {time}
-                      </button>
-                    ))}
+                {selectedDate && (
+                  <div className="mb-8">
+                    <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
+                      Available Time Slots
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {availableTimes.map(time => (
+                        <button
+                          key={time}
+                          onClick={() => setSelectedTime(time)}
+                          className={`py-3 px-4 rounded-lg border-2 text-sm font-bold transition-all ${selectedTime === time ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex gap-4">
                   <button
@@ -137,13 +183,102 @@ const BookAppointment = () => {
                     onClick={() => setStep(3)}
                     className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                   >
-                    Confirm Details
+                    Continue
                   </button>
                 </div>
               </motion.div>
             )}
 
             {step === 3 && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  x: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+              >
+                <h3 className="text-xl font-bold mb-6">Your Details</h3>
+                <div className="space-y-4 mb-8">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={clientDetails.name}
+                      onChange={e =>
+                        setClientDetails({
+                          ...clientDetails,
+                          name: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                      placeholder="John Doe"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      value={clientDetails.email}
+                      onChange={e =>
+                        setClientDetails({
+                          ...clientDetails,
+                          email: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                      placeholder="john@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      value={clientDetails.phone}
+                      onChange={e =>
+                        setClientDetails({
+                          ...clientDetails,
+                          phone: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                      placeholder="(555) 123-4567"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                  >
+                    Back
+                  </button>
+                  <button
+                    disabled={!clientDetails.name || !clientDetails.email || !clientDetails.phone}
+                    onClick={() => setStep(4)}
+                    className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
+                  >
+                    Review Booking
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && (
               <motion.div
                 initial={{
                   opacity: 0,
@@ -165,6 +300,18 @@ const BookAppointment = () => {
 
                   <div className="bg-slate-50 p-6 rounded-2xl text-left space-y-4 mb-8">
                     <div className="flex justify-between border-b border-slate-200 pb-3">
+                      <span className="text-slate-500">Name</span>
+                      <span className="font-bold text-slate-900">{clientDetails.name}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200 pb-3">
+                      <span className="text-slate-500">Email</span>
+                      <span className="font-bold text-slate-900">{clientDetails.email}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200 pb-3">
+                      <span className="text-slate-500">Phone</span>
+                      <span className="font-bold text-slate-900">{clientDetails.phone}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200 pb-3">
                       <span className="text-slate-500">Service</span>
                       <span className="font-bold text-slate-900">
                         {SERVICES.find(s => s.id === selectedService)?.name}
@@ -172,7 +319,7 @@ const BookAppointment = () => {
                     </div>
                     <div className="flex justify-between border-b border-slate-200 pb-3">
                       <span className="text-slate-500">Date</span>
-                      <span className="font-bold text-slate-900">{selectedDate}</span>
+                      <span className="font-bold text-slate-900">{formatDate(selectedDate)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Time</span>
@@ -180,12 +327,23 @@ const BookAppointment = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => alert('Booking Successful!')}
-                    className="w-full py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
-                  >
-                    Complete Booking
-                  </button>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setStep(3)}
+                      className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={() =>
+                        // Here i will handle completed booking. send to a backend, edit slot field to booked. maybe add to user profile(Optional)
+                        alert('Booking Successful! You will receive a confirmation email shortly.')
+                      }
+                      className="flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
+                    >
+                      Complete Booking
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -193,7 +351,7 @@ const BookAppointment = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BookAppointment
+export default BookAppointment;

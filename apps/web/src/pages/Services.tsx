@@ -57,8 +57,8 @@ const Services = () => {
                 </div>
                 <p className="text-slate-600 text-sm mb-6 grow">{service.description}</p>
                 <button
-                  onClick={() => navigate('/book-appointment')}
-                  className="w-full sm:w-auto px-4 py-2 border border-rose-600 text-rose-600 rounded-lg text-sm font-bold hover:bg-rose-600 hover:text-white transition-all"
+                  onClick={() => navigate('/book-appointment')} //Todo: add selected service name to url.. so that booked will select it when we are on the next page
+                  className="cursor-pointer w-full sm:w-auto px-4 py-2 border border-rose-600 text-rose-600 rounded-lg text-sm font-bold hover:bg-rose-600 hover:text-white transition-all"
                 >
                   Book Service
                 </button>

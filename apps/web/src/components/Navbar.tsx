@@ -45,7 +45,7 @@ const Navbar = () => {
               className={`h-8 w-8 ${location.pathname !== '/' || isScrolled ? 'text-rose-600' : 'text-white'}`}
             />
             <span
-              className={`ml-2 text-2xl font-serif font-bold tracking-tight ${
+              className={`hidden lg:inline ml-2 text-2xl font-serif font-bold tracking-tight ${
                 location.pathname !== '/' || isScrolled ? 'text-slate-900' : 'text-white'
               }`}
             >
@@ -54,7 +54,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8 items-center">
+          <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
             {NAV_LINKS.map(link => (
               <button
                 key={link.name}
@@ -77,7 +77,7 @@ const Navbar = () => {
 
             <button
               onClick={() => handleNavClick('/book-appointment')}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
+              className={`cursor-pointer px-6 py-2 rounded-full font-medium transition-all ${
                 location.pathname !== '/' || isScrolled
                   ? 'bg-rose-600 text-white hover:bg-rose-700'
                   : 'bg-white text-rose-600 hover:bg-rose-50'
@@ -91,7 +91,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(prev => !prev)}
-              className={isScrolled ? 'text-slate-900' : 'text-white'}
+              className={location.pathname !== '/' || isScrolled ? 'text-slate-900' : 'text-white'}
             >
               {isOpen ? <X /> : <Menu />}
             </button>

@@ -1,4 +1,5 @@
-import { SERVICES } from "@salon/data";
+import ServicesCard from '@/components/ServicesCard';
+import { SERVICES } from '@salon/data';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, Star, CheckCircle, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -16,47 +17,49 @@ const Homepage = () => {
             className="w-full h-full object-cover brightness-50"
           />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.8,
-            }}
-            className="max-w-2xl"
-          >
-            <span className="inline-block px-4 py-1 bg-rose-600/20 backdrop-blur-md border border-rose-500/30 rounded-full text-rose-400 text-sm font-semibold mb-6">
-              New Season Styles Now Available
-            </span>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">
-              Unveil Your Natural <span className="text-rose-500 italic">Radiance</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-200 mb-10 leading-relaxed max-w-xl">
-              From precision cuts to high-end wigs, we specialize in hair artistry that elevates
-              your personal style.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={() => navigate('book-appointment')}
-                className="cursor-pointer px-8 py-4 bg-rose-600 text-white rounded-full font-bold text-lg hover:bg-rose-700 transition-all flex items-center justify-center group"
-              >
-                Book Appointment
-                <Calendar className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-              </button>
-              <button
-                onClick={() => navigate('/shop')}
-                className=" cursor-pointer px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center"
-              >
-                Shop Collection
-              </button>
-            </div>
-          </motion.div>
+        <div className="relative z-10 w-full">
+          <div className=" px-4 sm:px-6 mx-auto max-w-7xl lg:px-8 text-white">
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.8,
+              }}
+              className=""
+            >
+              <span className="inline-block px-4 py-1 bg-rose-600/20 backdrop-blur-md border border-rose-500/30 rounded-full text-rose-400 text-sm font-semibold mb-6">
+                New Season Styles Now Available
+              </span>
+              <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">
+                Unveil Your Natural <span className="text-rose-500 italic">Radiance</span>
+              </h1>
+              <p className="text-lg md:text-xl text-slate-200 mb-10 leading-relaxed max-w-xl">
+                From precision cuts to high-end wigs, we specialize in hair artistry that elevates
+                your personal style.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => navigate('book-appointment')}
+                  className="cursor-pointer px-8 py-4 bg-rose-600 text-white rounded-full font-bold text-lg hover:bg-rose-700 transition-all flex items-center justify-center group"
+                >
+                  Book Appointment
+                  <Calendar className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                </button>
+                <button
+                  onClick={() => navigate('/shop')}
+                  className=" cursor-pointer px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center"
+                >
+                  Shop Collection
+                </button>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -75,7 +78,7 @@ const Homepage = () => {
             </div>
             <button
               onClick={() => navigate('/services')}
-              className="mt-6 md:mt-0 flex items-center text-rose-600 font-bold hover:text-rose-700 transition-colors"
+              className="cursor-pointer mt-6 md:mt-0 flex items-center text-rose-600 font-bold hover:text-rose-700 transition-colors"
             >
               View Full Menu <ArrowRight className="ml-2 h-4 w-4" />
             </button>
@@ -83,39 +86,14 @@ const Homepage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {SERVICES.slice(0, 3).map((service, idx) => (
-              <motion.div
-                key={service.id}
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                viewport={{
-                  once: true,
-                }}
-                transition={{
-                  delay: idx * 0.1,
-                }}
-                className="group cursor-pointer"
-              >
-                <div className="relative overflow-hidden rounded-2xl aspect-4/5 mb-6">
-                  <img
-                    src={service.image}
-                    alt={service.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-6 left-6 text-white opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300">
-                    <p className="font-bold text-xl">{service.name}</p>
-                    <p className="text-sm">Starting at ${service.price}</p>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{service.name}</h3>
-                <p className="text-slate-600 text-sm line-clamp-2">{service.description}</p>
-              </motion.div>
+              <ServicesCard
+                id={service.id}
+                idx={idx}
+                image={service.image}
+                name={service.name}
+                price={service.price}
+                description={service.description}
+              />
             ))}
           </div>
         </div>
