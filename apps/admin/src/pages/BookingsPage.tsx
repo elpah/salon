@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface Booking {
   id: string;
@@ -11,25 +11,28 @@ interface Booking {
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
 }
 
-const MOCK_BOOKINGS: Booking[] = [{
-  id: '1',
-  clientName: 'Sarah Johnson',
-  clientEmail: 'sarah@example.com',
-  clientPhone: '(555) 123-4567',
-  service: 'Silk Press',
-  date: '2024-01-19',
-  time: '10:00 AM',
-  status: 'confirmed'
-}, {
-  id: '2',
-  clientName: 'Michael Brown',
-  clientEmail: 'michael@example.com',
-  clientPhone: '(555) 987-6543',
-  service: 'Box Braids',
-  date: '2024-01-20',
-  time: '2:00 PM',
-  status: 'pending'
-}];
+const MOCK_BOOKINGS: Booking[] = [
+  {
+    id: '1',
+    clientName: 'Sarah Johnson',
+    clientEmail: 'sarah@example.com',
+    clientPhone: '(555) 123-4567',
+    service: 'Silk Press',
+    date: '2024-01-19',
+    time: '10:00 AM',
+    status: 'confirmed',
+  },
+  {
+    id: '2',
+    clientName: 'Michael Brown',
+    clientEmail: 'michael@example.com',
+    clientPhone: '(555) 987-6543',
+    service: 'Box Braids',
+    date: '2024-01-20',
+    time: '2:00 PM',
+    status: 'pending',
+  },
+];
 
 const BookingsPage = () => {
   const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
@@ -55,8 +58,8 @@ const BookingsPage = () => {
         <p className="text-slate-600">Manage all client appointments</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 ">
+        <table className="w-overflow-auto">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
