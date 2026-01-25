@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 interface Booking {
   id: string;
   clientName: string;
@@ -35,7 +33,6 @@ const MOCK_BOOKINGS: Booking[] = [
 ];
 
 const BookingsPage = () => {
-  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -53,11 +50,6 @@ const BookingsPage = () => {
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900 mb-2">Bookings</h2>
-        <p className="text-slate-600">Manage all client appointments</p>
-      </div>
-
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 ">
         <table className="w-overflow-auto">
           <thead className="bg-slate-50 border-b border-slate-200">
@@ -80,7 +72,7 @@ const BookingsPage = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {bookings.map(booking => (
+            {MOCK_BOOKINGS.map(booking => (
               <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4">
                   <div>
