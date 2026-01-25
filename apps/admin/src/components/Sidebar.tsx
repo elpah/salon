@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Package, Briefcase, LogOut, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services';
 
-const menuItems: { id: AdminPage; icon: any; label: string }[] = [
+const menuItems: { id: AdminPage; icon: LucideIcon; label: string }[] = [
   { id: 'bookings', icon: Calendar, label: 'Bookings' },
   { id: 'availability', icon: Clock, label: 'Availability' },
   { id: 'orders', icon: Package, label: 'Orders' },

@@ -1,4 +1,4 @@
-import { Theme, Container } from './types';
+import { type Theme, type Container } from './types';
 
 const injectedTheme: string = '%INJECTED_THEME%';
 const injectedContainer: string = '%INJECTED_CONTAINER%';
