@@ -37,7 +37,6 @@ const Sidebar = ({
 
   const handleMenuItemClick = (page: AdminPage) => {
     setPage(page);
-    // Close sidebar on mobile after selecting an item
     if (isMobile) {
       onClose();
     }
@@ -45,13 +44,12 @@ const Sidebar = ({
 
   return (
     <>
-      {isOpen && isMobile && <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />}
-
+      {/* {isOpen && isMobile && <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />} */}
       <motion.div
         initial={{ x: -280 }}
         animate={{ x: isOpen || !isMobile ? 0 : -280 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className=" fixed buttom-0 top-0 left-0 bottom-0 w-60 bg-slate-900 text-white flex flex-col z-50"
+        className=" fixed buttom-0 top-0 left-0 bottom-0 md:static md:top-auto md:bottom-auto md:left-aut md:min-h-screen w-60 bg-slate-900 text-white flex flex-col z-50"
       >
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <div>
@@ -71,7 +69,7 @@ const Sidebar = ({
               <button
                 key={item.id}
                 onClick={() => handleMenuItemClick(item.id)}
-                className={`w-full flex items-center px-6 py-3 transition-colors ${
+                className={`cursor-pointer w-full flex items-center px-6 py-3 transition-colors ${
                   currentPage === item.id
                     ? 'bg-rose-600 text-white'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -85,7 +83,7 @@ const Sidebar = ({
         </nav>
         <button
           onClick={onLogout}
-          className="flex items-center px-6 py-4 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors border-t border-slate-800"
+          className="cursor-pointer flex items-center px-6 py-4 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors border-t border-slate-800"
         >
           <LogOut className="h-5 w-5 mr-3" />
           <span className="font-medium">Logout</span>

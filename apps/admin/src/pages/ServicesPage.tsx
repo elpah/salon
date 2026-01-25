@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Briefcase } from 'lucide-react';
+import { Trash2, Briefcase } from 'lucide-react';
 import { useContext } from 'react';
 import AddServicesModal from '../components/AddServicesModal';
 import { GlobalContext } from '../context/GlobalContext';
@@ -12,20 +12,6 @@ const ServicesPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">Services</h2>
-          <p className="text-slate-600">Manage your salon services</p>
-        </div>
-        <button
-          onClick={() => globalContext.setshowAddServicesModal(true)}
-          className="flex items-center px-6 py-3 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 transition-all"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Add Service
-        </button>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {globalContext.services.map(service => (
           <div

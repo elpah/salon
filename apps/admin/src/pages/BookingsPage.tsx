@@ -49,62 +49,60 @@ const BookingsPage = () => {
   };
 
   return (
-    <div>
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 ">
-        <table className="w-overflow-auto">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Client
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Service
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Date & Time
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Actions
-              </th>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-scroll">
+      {/* <table className="">
+        <thead className="bg-slate-50 border-b border-slate-200">
+          <tr>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Client
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Service
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Date & Time
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-200">
+          {MOCK_BOOKINGS.map(booking => (
+            <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-6 py-4">
+                <div>
+                  <p className="font-medium text-slate-900">{booking.clientName}</p>
+                  <p className="text-sm text-slate-500">{booking.clientEmail}</p>
+                  <p className="text-xs text-slate-400">{booking.clientPhone}</p>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <p className="text-slate-900">{booking.service}</p>
+              </td>
+              <td className="px-6 py-4">
+                <p className="text-slate-900">{booking.date}</p>
+                <p className="text-sm text-slate-500">{booking.time}</p>
+              </td>
+              <td className="px-6 py-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}
+                >
+                  {booking.status}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <button className="text-rose-600 hover:text-rose-700 text-sm font-medium">
+                  View Details
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {MOCK_BOOKINGS.map(booking => (
-              <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="font-medium text-slate-900">{booking.clientName}</p>
-                    <p className="text-sm text-slate-500">{booking.clientEmail}</p>
-                    <p className="text-xs text-slate-400">{booking.clientPhone}</p>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="text-slate-900">{booking.service}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="text-slate-900">{booking.date}</p>
-                  <p className="text-sm text-slate-500">{booking.time}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}
-                  >
-                    {booking.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <button className="text-rose-600 hover:text-rose-700 text-sm font-medium">
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table> */}
     </div>
   );
 };

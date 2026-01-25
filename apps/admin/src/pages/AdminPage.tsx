@@ -94,16 +94,16 @@ export const AdminDashboard = () => {
     }
   };
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Sidebar
-        currentPage={currentPage}
-        setPage={setCurrentPage}
-        onLogout={handleLogout}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="flex-1 p-3 md:ml-64">
-        <div className="md:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between">
+    <div className=" md:flex min-h-screen bg-slate-50">
+        <Sidebar
+          currentPage={currentPage}
+          setPage={setCurrentPage}
+          onLogout={handleLogout}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      <main className="p-3">
+        <div className="md:hidden z-30 bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
@@ -132,7 +132,7 @@ export const AdminDashboard = () => {
               duration: 0.3,
             }}
           >
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-8 pt-6 pb-2 border-b-3">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 mb-2">{header}</h2>
                 <p className="text-slate-600">{subHeader}</p>
