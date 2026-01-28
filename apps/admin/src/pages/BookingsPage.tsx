@@ -49,11 +49,11 @@ const BookingsPage = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-scroll">
-      {/* <table className="">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+      <table className="w-full">
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+            <th className="sticky left-0 z-20 bg-slate-50 px-6 py-4 shadow-[inset_-1px_0_0_0_rgb(226,232,240)] text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
               Client
             </th>
             <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
@@ -73,7 +73,10 @@ const BookingsPage = () => {
         <tbody className="divide-y divide-slate-200">
           {MOCK_BOOKINGS.map(booking => (
             <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-              <td className="px-6 py-4">
+              <td
+                className=" sticky left-0 z-10 shadow-[inset_-1px_0_0_0_rgb(226,232,240)]
+ bg-white px-6 py-4"
+              >
                 <div>
                   <p className="font-medium text-slate-900">{booking.clientName}</p>
                   <p className="text-sm text-slate-500">{booking.clientEmail}</p>
@@ -102,9 +105,15 @@ const BookingsPage = () => {
             </tr>
           ))}
         </tbody>
-      </table> */}
+      </table>
     </div>
   );
 };
 
 export default BookingsPage;
+
+// brand IG - to showcase what i do -
+
+// Reveal to me what i dont know. Show me what i have to know
+// ELPA IT School
+//

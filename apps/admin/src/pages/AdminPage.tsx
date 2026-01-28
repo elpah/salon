@@ -102,11 +102,11 @@ export const AdminDashboard = () => {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
-      <main className="p-3">
-        <div className="md:hidden z-30 bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between">
+      <main className="p-3 grow">
+        <div className="md:hidden z-30 bg-white border-b border-slate-200  py-4 flex items-center justify-between">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+            className=" text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
           >
             <Menu className="h-6 w-6" />
           </button>
