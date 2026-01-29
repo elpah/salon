@@ -1,0 +1,9 @@
+{
+  "name": "@salon/api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@salon/types": "^1.0.0"
+  }
+}
