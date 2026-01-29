@@ -13,6 +13,6 @@ app.use("/admin/api/", adminRoute);
 
 app.get("/health", (_, res) => res.json({ ok: true }));
 
-app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
+app.listen(8000, () => console.log("Backend running on http://localhost:8000"));
 
 export default app;

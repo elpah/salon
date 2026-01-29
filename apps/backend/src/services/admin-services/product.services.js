@@ -1,4 +1,4 @@
-import client from "../../config/client.js";
+// import client from "../../config/client.js";
 
 import { connectToDatabase } from "../../config/db.js";
 import { randomUUID } from "crypto";
@@ -36,7 +36,7 @@ const getAllProducts = async () => {
 
     const products = await productCol.find().toArray();
 
-    return { products };
+    return products;
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error in getAllProducts:", error);
@@ -69,7 +69,7 @@ const getProductById = async (productId) => {
     const productCol = db.collection("products");
 
     const product = await productCol.findOne(
-      { id: productId },
+      { _id: new ObjectId(productId) },
       { projection: { _id: 0 } },
     );
 
