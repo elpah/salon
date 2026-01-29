@@ -3,7 +3,6 @@ import axios from "axios";
 import type { Product } from "@salon/types";
 
 const fetchProducts = async (apiUrl: string): Promise<Product[]> => {
-    
   const res = await axios.get<Product[]>(`${apiUrl}/products`);
   return res.data;
 };

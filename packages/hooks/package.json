@@ -1,6 +1,6 @@
 {
-  "name": "@salon/hooks",       
-  "version": "1.0.0",          
-  "main": "src/index.ts",           
-  "type": "module"      
+  "name": "@salon/hooks",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "type": "module"
 }
