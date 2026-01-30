@@ -1,5 +1,3 @@
-// import client from "../../config/client.js";
-
 import { connectToDatabase } from "../../config/db.js";
 import { randomUUID } from "crypto";
 
@@ -63,13 +61,13 @@ const getAllProducts = async () => {
 //   }
 // };
 
-const getProductById = async (productId) => {
+const getProductById = async (id) => {
   try {
     const db = await connectToDatabase();
     const productCol = db.collection("products");
 
     const product = await productCol.findOne(
-      { _id: new ObjectId(productId) },
+      { id },
       { projection: { _id: 0 } },
     );
 
