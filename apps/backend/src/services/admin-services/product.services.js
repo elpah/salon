@@ -114,51 +114,38 @@ const permanentlyDeleteProductById = async (id) => {
   try {
     const db = await connectToDatabase();
     const deletedCol = db.collection("deleted-products");
-
-    const result = await deletedCol.findOneAndDelete({ id });
-
-    if (!result.value) {
+    const result = await deletedCol.deleteOne({ id });
+    if (result.deletedCount === 0) {
       return { success: false, message: "Product not found" };
     }
-
     return {
       success: true,
       message: "Product permanently deleted successfully",
     };
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error permanently deleting product:", err);
-    }
-    return {
-      success: false,
-      message: "Failed to permanently delete product",
-    };
+    console.error("Error deleting product:", err);
+    return { success: false, message: err.message };
   }
 };
 
-export const restoreDeletedProductByID = async (id) => {
+const restoreDeletedProductById = async (id) => {
   try {
     const db = await connectToDatabase();
-    const productCol = db.collection("products");
     const deletedCol = db.collection("deleted-products");
-    const result = await deletedCol.findOneAndDelete({ id });
-
-    if (!result.value) {
+    const productCol = db.collection("products");
+    const product = await deletedCol.findOne(
+      { id },
+      { projection: { _id: 0 } },
+    );
+    if (!product) {
       return { success: false, message: "Product not found" };
     }
-    await productCol.insertOne(result.value);
-    return {
-      success: true,
-      message: "Product restored successfully",
-    };
+    await productCol.insertOne(product);
+    await deletedCol.deleteOne({ id });
+    return { success: true, message: "Product restored successfully." };
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error restoring product:", err);
-    }
-    return {
-      success: false,
-      message: "Failed to restore product",
-    };
+    console.error("Error restoring product:", err);
+    return { success: false, message: err.message };
   }
 };
 
@@ -168,5 +155,5 @@ export {
   getProductById,
   deleteProductById,
   permanentlyDeleteProductById,
-  restoreDeletedProductByID
+  restoreDeletedProductById,
 };
