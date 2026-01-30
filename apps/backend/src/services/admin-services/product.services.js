@@ -5,7 +5,7 @@ import { randomUUID } from "crypto";
 const addNewProduct = async (product) => {
   try {
     const newProduct = {
-      carId: randomUUID(),
+      id: randomUUID(),
       createdAt: new Date(),
       ...product,
     };

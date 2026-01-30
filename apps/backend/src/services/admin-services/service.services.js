@@ -130,7 +130,8 @@ const restoreDeletedServiceById = async (id) => {
   }
 };
 
-permanentlyDeleteServiceById;
+
+
 export {
   addNewService,
   getAllServices,

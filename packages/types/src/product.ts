@@ -5,7 +5,7 @@ export interface Product {
   name: string;
   price: number;
   stock:number;
-  category: "wigs" | "equipment" | "care";
+  category: "wigs" | "equipment" | "care" | string;
   image: string;
   description: string;
 }

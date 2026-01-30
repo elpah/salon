@@ -50,14 +50,14 @@ const ServicesPage = () => {
   if (isLoading) {
     return (
       <div className="text-center py-16">
-        <p className="text-slate-500">Loading products...</p>
+        <p className="text-slate-500">Loading Services...</p>
       </div>
     );
   }
   if (isError) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500">Failed to load products. Please try again.</p>
+        <p className="text-red-500">Failed to load services. Please try again.</p>
       </div>
     );
   }
@@ -131,4 +131,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage
+export default ServicesPage;

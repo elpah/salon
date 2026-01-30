@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GlobalContext } from '../context/GlobalContext';
-import type { Product } from '../types/product.type';
+import type { Product } from '@salon/types';
 import { X } from 'lucide-react';
 
 const AddProductModal = () => {
@@ -18,6 +18,7 @@ const AddProductModal = () => {
     if (newProduct.name && newProduct.price > 0) {
       const product: Product = {
         id: Date.now().toString(),
+        image:"some image",
         ...newProduct,
       };
       globalContext.setProducts([...globalContext.products, product]);

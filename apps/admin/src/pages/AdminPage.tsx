@@ -52,7 +52,7 @@ export const AdminDashboard = () => {
   const pageConfig = {
     availability: {
       showButton: true,
-      label: 'Add Time Slot',
+      label: 'Add Availability',
       action: () => globalContext.setShowAddSlotModal(true),
     },
     bookings: {
@@ -95,13 +95,13 @@ export const AdminDashboard = () => {
   };
   return (
     <div className=" md:flex min-h-screen bg-slate-50">
-        <Sidebar
-          currentPage={currentPage}
-          setPage={setCurrentPage}
-          onLogout={handleLogout}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+      <Sidebar
+        currentPage={currentPage}
+        setPage={setCurrentPage}
+        onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       <main className="p-3 grow">
         <div className="md:hidden z-30 bg-white border-b border-slate-200  py-4 flex items-center justify-between">
           <button

@@ -14,6 +14,11 @@ import {
   permanentlyDeleteServiceById,
   restoreDeletedServiceById,
 } from "../services/admin-services/service.services.js";
+import {
+  createAvailabilityWindow,
+  getAllAvailabilities,
+  deleteAvailabilityById,
+} from "../services/admin-services/availability.services.js";
 
 const adminRoute = Router();
 
@@ -63,9 +68,7 @@ adminRoute.delete("/delete-product/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await deleteProductById(id);
-    console.log("success");
     if (result.success) {
-      console.log("success");
       res.status(200).json({ message: "Product deleted successfully" });
     } else {
       res.status(400).json({ message: result.message });
@@ -82,9 +85,7 @@ adminRoute.delete("/delete-service/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await deleteServiceById(id);
-    console.log("success");
     if (result.success) {
-      console.log("success");
       res.status(200).json({ message: "Service deleted successfully" });
     } else {
       res.status(400).json({ message: result.message });
@@ -102,7 +103,6 @@ adminRoute.delete("/delete-product-forever/:id", async (req, res) => {
   try {
     const result = await permanentlyDeleteProductById(id);
     if (result.success) {
-      console.log("success");
       res.status(200).json({ message: "Product deleted successfully" });
     } else {
       res.status(400).json({ message: result.message });
@@ -120,7 +120,6 @@ adminRoute.delete("/delete-service-forever/:id", async (req, res) => {
   try {
     const result = await permanentlyDeleteServiceById(id);
     if (result.success) {
-      console.log("success");
       res.status(200).json({ message: "Service deleted successfully" });
     } else {
       res.status(400).json({ message: result.message });
@@ -185,4 +184,46 @@ adminRoute.post("/restore-service/:id", async (req, res) => {
   }
 });
 
+adminRoute.post("/create-new-availability", async (req, res) => {
+  try {
+    // console.log("Received data:", req.body);
+    const insertedId = await createAvailabilityWindow(req.body);
+    console.log();
+    return res.status(201).json({
+      message: "Availability window created successfully",
+      id: insertedId,
+    });
+  } catch (err) {
+    console.error("Error in /create-new-availability:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+adminRoute.get("/availabilities", async (_req, res) => {
+  try {
+    const availabilities = await getAllAvailabilities();
+    res.status(200).json(availabilities);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+adminRoute.delete("/delete-availability/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await deleteAvailabilityById(id);
+    if (result.success) {
+      res.status(200).json({ message: "Availability deleted successfully" });
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error deleting availability:", err);
+    }
+    res.status(500).send("Internal Server Error");
+  }
+});
 export default adminRoute;

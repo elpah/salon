@@ -2,32 +2,68 @@ import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
-import type { TimeSlot } from '../types/timeslot.type';
+import type { AvailabilityWindow } from '../types/availabilityWindow.type';
+import useCreateAvailability from '../hooks/useCreateNewAvailability';
+import { toast } from 'react-toastify';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AddSlotModal = () => {
   const globalContext = useContext(GlobalContext);
+  const { mutate, isPending } = useCreateAvailability();
+
+  const queryClient = useQueryClient();
+
   const [newSlot, setNewSlot] = useState({
     date: '',
     startTime: '',
     endTime: '',
+    slotMinutes: 30,
+    bufferMinutes: 10,
   });
+  const notifySuccess = (message: string) => {
+    toast.success(message, {});
+  };
 
+  const notifyError = (message: string) => {
+    toast.error(message, {});
+  };
   const handleAddSlot = () => {
-    if (newSlot.date && newSlot.startTime && newSlot.endTime) {
-      const slot: TimeSlot = {
+    if (
+      newSlot.date &&
+      newSlot.startTime &&
+      newSlot.endTime &&
+      newSlot.slotMinutes &&
+      newSlot.bufferMinutes
+    ) {
+      const slot: AvailabilityWindow = {
         id: Date.now().toString(),
         date: newSlot.date,
         startTime: newSlot.startTime,
         endTime: newSlot.endTime,
-        isBooked: false,
+        slotMinutes: newSlot.slotMinutes,
+        bufferMinutes: newSlot.bufferMinutes,
       };
-      globalContext.setTimeSlots([...globalContext.timeSlots, slot]);
-      setNewSlot({
-        date: '',
-        startTime: '',
-        endTime: '',
+
+      mutate(slot, {
+        onSuccess: () => {
+          notifySuccess('Availability Successfully Added');
+          queryClient.invalidateQueries({ queryKey: ['availabilities'] });
+          setNewSlot({
+            date: '',
+            startTime: '',
+            endTime: '',
+            slotMinutes: 30,
+            bufferMinutes: 10,
+          });
+          globalContext.setShowAddSlotModal(false);
+        },
+        onError: err => {
+          notifyError('Something went wrong while submitting.');
+          if (import.meta.env.VITE_NODE_ENV !== 'production') {
+            console.error(err);
+          }
+        },
       });
-      globalContext.setShowAddSlotModal(false);
     }
   };
   return (
@@ -115,6 +151,42 @@ const AddSlotModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
             />
           </div>
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm font-semibold text-slate-700 mb-2 space-y-4">
+            Slot Duration (minutes)
+          </label>
+          <input
+            type="number"
+            min={5}
+            step={5}
+            value={newSlot.slotMinutes}
+            onChange={e =>
+              setNewSlot({
+                ...newSlot,
+                slotMinutes: Number(e.target.value),
+              })
+            }
+            className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+          />
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm font-semibold text-slate-700 mb-2 space-y-4">
+            Breaks
+          </label>
+          <input
+            type="number"
+            min={5}
+            step={5}
+            value={newSlot.bufferMinutes}
+            onChange={e =>
+              setNewSlot({
+                ...newSlot,
+                bufferMinutes: Number(e.target.value),
+              })
+            }
+            className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+          />
         </div>
 
         <button

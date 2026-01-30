@@ -1,7 +1,11 @@
 import { SERVICES } from '@salon/data';
+import { useServices } from '@salon/hooks';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -12,6 +16,22 @@ const BookAppointment = () => {
     email: '',
     phone: '',
   });
+  const { data: services, isLoading, isError } = useServices(apiUrl);
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-slate-500">Loading Services...</p>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load services. Please try again.</p>
+      </div>
+    );
+  }
 
   const availableSlots = [
     {
@@ -39,7 +59,7 @@ const BookAppointment = () => {
       date: '2024-01-23',
       times: ['10:00 AM - 11:00 AM', '2:00 PM - 3:00 PM', '4:00 PM - 5:00 PM'],
     },
-  ]; // I will fetch this data from a backend; add booked key with value yes/no to distinguish between available and unavalable slots. 
+  ]; // I will fetch this data from a backend; add booked key with value yes/no to distinguish between available and unavalable slots.
   const selectedSlot = availableSlots.find(slot => slot.date === selectedDate);
   const availableTimes = selectedSlot ? selectedSlot.times : [];
   const formatDate = (dateStr: string) => {
@@ -92,7 +112,7 @@ const BookAppointment = () => {
               >
                 <h3 className="text-xl font-bold mb-6">Select a Service</h3>
                 <div className="space-y-4">
-                  {SERVICES.map(service => (
+                  {services?.map(service => (
                     <div
                       key={service.id}
                       onClick={() => setSelectedService(service.id)}
@@ -101,7 +121,7 @@ const BookAppointment = () => {
                       <div>
                         <p className="font-bold text-slate-900">{service.name}</p>
                         <p className="text-xs text-slate-500">
-                          {service.duration} • ${service.price}
+                          {service.duration} • €{service.price}
                         </p>
                       </div>
                       {selectedService === service.id && (

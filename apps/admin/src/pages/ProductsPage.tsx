@@ -6,7 +6,7 @@ import AddProductModal from '../components/AddProductModal';
 import { useProducts } from '@salon/hooks';
 import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ShowModal from '../components/modal/ShowModal';
 
@@ -14,7 +14,6 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {
   const globalContext = useContext(GlobalContext);
   const [productIdToDelete, setProductIdToDelete] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const { data: products, isLoading, isError, refetch } = useProducts(apiUrl);
 
   const { mutate: deleteProduct } = useDeleteProduct();
@@ -28,11 +27,11 @@ const ProductsPage = () => {
 
   const handleDeleteProduct = (id: string) => {
     setProductIdToDelete(id);
-    setShowModal(true);
+    globalContext.setShowConfirmationModal(true);
   };
 
   const handleProceedClick = () => {
-    setShowModal(false);
+    globalContext.setShowConfirmationModal;
     if (!productIdToDelete) return;
     deleteProduct(productIdToDelete!, {
       onSuccess: () => {
@@ -98,21 +97,21 @@ const ProductsPage = () => {
           </div>
         )}
       </div>
-      {showModal && (
+      {globalContext.showConfirmationModal && (
         <ShowModal
           text={'Are you sure you want to delete product?'}
           handleProceedClick={() => {
             handleProceedClick();
           }}
           handleCancelClick={() => {
-            setShowModal(false);
+            globalContext.setShowConfirmationModal;
             setProductIdToDelete(null);
           }}
         />
       )}
       {/* Add Product Modal */}
       <AnimatePresence>{globalContext.showAddProductModal && <AddProductModal />}</AnimatePresence>
-      <ToastContainer
+      {/* <ToastContainer
         position="bottom-right"
         autoClose={1500}
         newestOnTop={false}
@@ -124,7 +123,7 @@ const ProductsPage = () => {
         toastStyle={{
           fontSize: '14px',
         }}
-      />
+      /> */}
     </div>
   );
 };
