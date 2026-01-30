@@ -1,20 +1,51 @@
 import { AnimatePresence } from 'framer-motion';
 import { Package, Trash2 } from 'lucide-react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 import AddProductModal from '../components/AddProductModal';
 import { useProducts } from '@salon/hooks';
+import type { Product } from '../types/product.type';
+import useDeleteProduct from '../hooks/useDeleteProduct';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ShowModal from '../components/modal/ShowModal';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {
   const globalContext = useContext(GlobalContext);
+  const [productIdToDelete, setProductIdToDelete] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const { data: products, isLoading, isError } = useProducts(apiUrl);
 
-  console.log('data', products);
+  const { mutate: deleteProduct } = useDeleteProduct();
 
-  // Delete product locally
+  const notifySuccess = () => {
+    toast.success('Product Deleted Successfully.', {});
+  };
+
   const handleDeleteProduct = (id: string) => {
-    globalContext.setProducts(globalContext.products.filter(p => p.id !== id));
+    // globalContext.setProducts(globalContext.products.filter(p => p.id !== id));
+    setShowModal(true);
+  };
+
+  const handleProceedClick = () => {
+    console.log('proceed clicked');
+    setShowModal(false);
+    // setShowModal(false);
+    // if (!productIdToDelete) return;
+
+    // deleteProduct(productIdToDelete!, {
+    //   onSuccess: () => {
+    //     notifySuccess();
+    //     setProductIdToDelete(null);
+    //     // refetchFnRef.current?.();
+    //   },
+    //   onError: (error: any) => {
+    //     console.log(error);
+    //     // notifyError(error.message);
+    //     // setCarIdToDelete(null);
+    //   },
+    // });
   };
 
   if (isLoading) {
@@ -32,13 +63,11 @@ const ProductsPage = () => {
     );
   }
 
-  console.log('Products:', products);
-
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {products && products.length > 0 ? (
-          products.map(product => (
+          products.map((product: Product) => (
             <div
               key={product.id}
               className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all"
@@ -50,7 +79,7 @@ const ProductsPage = () => {
                 </div>
                 <button
                   onClick={() => handleDeleteProduct(product.id)}
-                  className="text-red-600 hover:text-red-700 p-2"
+                  className="cursor-pointer text-red-600 hover:text-red-700 p-2"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -70,6 +99,18 @@ const ProductsPage = () => {
           </div>
         )}
       </div>
+      {showModal && (
+        <ShowModal
+          text={'Are you sure you want to delete product?'}
+          handleProceedClick={() => {
+            handleProceedClick();
+          }}
+          handleCancelClick={() => {
+            setShowModal(false);
+            setProductIdToDelete(null);
+          }}
+        />
+      )}
       {/* Add Product Modal */}
       <AnimatePresence>{globalContext.showAddProductModal && <AddProductModal />}</AnimatePresence>
     </div>

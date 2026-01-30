@@ -3,17 +3,38 @@ import { Trash2, Briefcase } from 'lucide-react';
 import { useContext } from 'react';
 import AddServicesModal from '../components/AddServicesModal';
 import { GlobalContext } from '../context/GlobalContext';
+import { useServices } from '@salon/hooks';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ServicesPage = () => {
   const globalContext = useContext(GlobalContext);
-  const handleDeleteService = (id: string) => {
-    globalContext.setServices(globalContext.services.filter(s => s.id !== id));
-  };
+
+  const { data: services, isLoading, isError } = useServices(apiUrl);
+
+  // const handleDeleteService = (id: string) => {
+  //   globalContext.setServices(globalContext.services.filter(s => s.id !== id));
+  // };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-slate-500">Loading products...</p>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load products. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {globalContext.services.map(service => (
+        {services?.map(service => (
           <div
             key={service.id}
             className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all"
@@ -23,12 +44,12 @@ const ServicesPage = () => {
                 <h3 className="text-lg font-bold text-slate-900">{service.name}</h3>
                 <p className="text-sm text-slate-500">{service.category}</p>
               </div>
-              <button
+              {/* <button
                 onClick={() => handleDeleteService(service.id)}
                 className="text-red-600 hover:text-red-700 p-2"
               >
                 <Trash2 className="h-4 w-4" />
-              </button>
+              </button> */}
             </div>
             <p className="text-sm text-slate-600 mb-4">{service.description}</p>
             <div className="flex justify-between items-center pt-4 border-t border-slate-100">
@@ -39,7 +60,7 @@ const ServicesPage = () => {
         ))}
       </div>
 
-      {globalContext.services.length === 0 && (
+      {services?.length === 0 && (
         <div className="text-center py-16 bg-slate-50 rounded-xl">
           <Briefcase className="h-16 w-16 text-slate-300 mx-auto mb-4" />
           <p className="text-slate-600 font-medium">No services added yet</p>

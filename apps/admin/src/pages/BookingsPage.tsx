@@ -75,7 +75,7 @@ const BookingsPage = () => {
             <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
               <td
                 className=" sticky left-0 z-10 shadow-[inset_-1px_0_0_0_rgb(226,232,240)]
- bg-white px-6 py-4"
+                 bg-white px-6 py-4"
               >
                 <div>
                   <p className="font-medium text-slate-900">{booking.clientName}</p>
