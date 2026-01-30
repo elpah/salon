@@ -7,3 +7,9 @@ export interface Product {
   image: string;
   description: string;
 }
+
+export interface UseProductsResult {
+  data: Product[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+}
