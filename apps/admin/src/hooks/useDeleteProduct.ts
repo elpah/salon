@@ -9,7 +9,7 @@ const deleteProduct = async (productId: string) => {
   //   const token = await user.getIdToken();
 
   const response = await axios.delete(
-    `${import.meta.env.VITE_API_URL}delete-product/${productId}`,
+    `${import.meta.env.VITE_API_URL}/delete-product/${productId}`,
     {
       headers: {
         //   Authorization: `Bearer ${token}`,

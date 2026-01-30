@@ -42,7 +42,6 @@ const getAllServices = async () => {
   }
 };
 
-
 const getServiceById = async (id) => {
   try {
     const db = await connectToDatabase();
@@ -66,4 +65,77 @@ const getServiceById = async (id) => {
   }
 };
 
-export { addNewService, getAllServices, getServiceById };
+const deleteServiceById = async (id) => {
+  try {
+    const db = await connectToDatabase();
+
+    const serviceCol = db.collection("services");
+    const deletedCol = db.collection("deleted-services");
+
+    const service = await serviceCol.findOne(
+      { id },
+      { projection: { _id: 0 } },
+    );
+
+    if (!service) {
+      return { success: false, message: "Service not found" };
+    }
+
+    await deletedCol.insertOne(service);
+    await serviceCol.deleteOne({ id });
+
+    return { success: true, message: "Service deleted successfully." };
+  } catch (err) {
+    console.error("Error deleting service:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+const permanentlyDeleteServiceById = async (id) => {
+  try {
+    const db = await connectToDatabase();
+    const deletedCol = db.collection("deleted-services");
+    const result = await deletedCol.deleteOne({ id });
+    if (result.deletedCount === 0) {
+      return { success: false, message: "Service not found" };
+    }
+    return {
+      success: true,
+      message: "Service permanently deleted successfully",
+    };
+  } catch (err) {
+    console.error("Error deleting service:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+const restoreDeletedServiceById = async (id) => {
+  try {
+    const db = await connectToDatabase();
+    const deletedCol = db.collection("deleted-services");
+    const serviceCol = db.collection("services");
+    const service = await deletedCol.findOne(
+      { id },
+      { projection: { _id: 0 } },
+    );
+    if (!service) {
+      return { success: false, message: "Service not found" };
+    }
+    await serviceCol.insertOne(service);
+    await deletedCol.deleteOne({ id });
+    return { success: true, message: "Service restored successfully." };
+  } catch (err) {
+    console.error("Error restoring service:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+permanentlyDeleteServiceById;
+export {
+  addNewService,
+  getAllServices,
+  getServiceById,
+  deleteServiceById,
+  permanentlyDeleteServiceById,
+  restoreDeletedServiceById,
+};

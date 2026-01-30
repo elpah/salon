@@ -10,6 +10,9 @@ import {
 import {
   getAllServices,
   getServiceById,
+  deleteServiceById,
+  permanentlyDeleteServiceById,
+  restoreDeletedServiceById,
 } from "../services/admin-services/service.services.js";
 
 const adminRoute = Router();
@@ -75,7 +78,26 @@ adminRoute.delete("/delete-product/:id", async (req, res) => {
   }
 });
 
-adminRoute.delete("/delete-forever/:id", async (req, res) => {
+adminRoute.delete("/delete-service/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await deleteServiceById(id);
+    console.log("success");
+    if (result.success) {
+      console.log("success");
+      res.status(200).json({ message: "Service deleted successfully" });
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error deleting Service:", err);
+    }
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+adminRoute.delete("/delete-product-forever/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await permanentlyDeleteProductById(id);
@@ -93,6 +115,23 @@ adminRoute.delete("/delete-forever/:id", async (req, res) => {
   }
 });
 
+adminRoute.delete("/delete-service-forever/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await permanentlyDeleteServiceById(id);
+    if (result.success) {
+      console.log("success");
+      res.status(200).json({ message: "Service deleted successfully" });
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error deleting Service:", err);
+    }
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 adminRoute.post("/restore-product/:id", async (req, res) => {
   const { id } = req.params;
@@ -120,5 +159,30 @@ adminRoute.post("/restore-product/:id", async (req, res) => {
   }
 });
 
+adminRoute.post("/restore-service/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await restoreDeletedServiceById(id);
+
+    if (!result.success) {
+      return res.status(404).json({
+        message: result.message || "Service not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Service restored successfully",
+    });
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error restoring Service:", err);
+    }
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
 
 export default adminRoute;

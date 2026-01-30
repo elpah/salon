@@ -4,9 +4,9 @@ import { useContext, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 import AddProductModal from '../components/AddProductModal';
 import { useProducts } from '@salon/hooks';
-import type { Product } from '../types/product.type';
+import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ShowModal from '../components/modal/ShowModal';
 
@@ -15,37 +15,36 @@ const ProductsPage = () => {
   const globalContext = useContext(GlobalContext);
   const [productIdToDelete, setProductIdToDelete] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { data: products, isLoading, isError } = useProducts(apiUrl);
+  const { data: products, isLoading, isError, refetch } = useProducts(apiUrl);
 
   const { mutate: deleteProduct } = useDeleteProduct();
 
   const notifySuccess = () => {
     toast.success('Product Deleted Successfully.', {});
   };
+  const notifyError = (message: string) => {
+    toast.error(message, {});
+  };
 
   const handleDeleteProduct = (id: string) => {
-    // globalContext.setProducts(globalContext.products.filter(p => p.id !== id));
+    setProductIdToDelete(id);
     setShowModal(true);
   };
 
   const handleProceedClick = () => {
-    console.log('proceed clicked');
     setShowModal(false);
-    // setShowModal(false);
-    // if (!productIdToDelete) return;
-
-    // deleteProduct(productIdToDelete!, {
-    //   onSuccess: () => {
-    //     notifySuccess();
-    //     setProductIdToDelete(null);
-    //     // refetchFnRef.current?.();
-    //   },
-    //   onError: (error: any) => {
-    //     console.log(error);
-    //     // notifyError(error.message);
-    //     // setCarIdToDelete(null);
-    //   },
-    // });
+    if (!productIdToDelete) return;
+    deleteProduct(productIdToDelete!, {
+      onSuccess: () => {
+        notifySuccess();
+        refetch();
+      },
+      onError: (error: any) => {
+        console.log(error);
+        notifyError(error.message);
+      },
+    });
+    setProductIdToDelete(null);
   };
 
   if (isLoading) {
@@ -86,7 +85,7 @@ const ProductsPage = () => {
               </div>
               <p className="text-sm text-slate-600 mb-4">{product.description}</p>
               <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <p className="text-xl font-bold text-rose-600">${product.price}</p>
+                <p className="text-xl font-bold text-rose-600">€{product.price}</p>
                 <p className="text-sm text-slate-500">Stock: {product.stock}</p>
               </div>
             </div>
@@ -113,6 +112,19 @@ const ProductsPage = () => {
       )}
       {/* Add Product Modal */}
       <AnimatePresence>{globalContext.showAddProductModal && <AddProductModal />}</AnimatePresence>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        theme="colored"
+        toastStyle={{
+          fontSize: '14px',
+        }}
+      />
     </div>
   );
 };

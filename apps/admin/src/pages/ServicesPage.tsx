@@ -1,20 +1,51 @@
 import { AnimatePresence } from 'framer-motion';
 import { Trash2, Briefcase } from 'lucide-react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import AddServicesModal from '../components/AddServicesModal';
 import { GlobalContext } from '../context/GlobalContext';
 import { useServices } from '@salon/hooks';
+import { toast, ToastContainer } from 'react-toastify';
+import ShowModal from '../components/modal/ShowModal';
+import 'react-toastify/dist/ReactToastify.css';
+import useDeleteService from '../hooks/useDeleteService';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const ServicesPage = () => {
   const globalContext = useContext(GlobalContext);
+  const [serviceIdToDelete, setServiceIdToDelete] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const { data: services, isLoading, isError, refetch } = useServices(apiUrl);
+  const { mutate: deleteProduct } = useDeleteService();
 
-  // const handleDeleteService = (id: string) => {
-  //   globalContext.setServices(globalContext.services.filter(s => s.id !== id));
-  // };
+  const notifySuccess = () => {
+    toast.success('Product Deleted Successfully.', {});
+  };
+  const notifyError = (message: string) => {
+    toast.error(message, {});
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setServiceIdToDelete(id);
+    setShowModal(true);
+  };
+
+  const handleProceedClick = () => {
+    setShowModal(false);
+    if (!serviceIdToDelete) return;
+    deleteProduct(serviceIdToDelete!, {
+      onSuccess: () => {
+        notifySuccess();
+        refetch();
+      },
+      onError: (error: any) => {
+        console.log(error);
+        notifyError(error.message);
+      },
+    });
+    setServiceIdToDelete(null);
+  };
 
   if (isLoading) {
     return (
@@ -44,16 +75,16 @@ const ServicesPage = () => {
                 <h3 className="text-lg font-bold text-slate-900">{service.name}</h3>
                 <p className="text-sm text-slate-500">{service.category}</p>
               </div>
-              {/* <button
-                onClick={() => handleDeleteService(service.id)}
-                className="text-red-600 hover:text-red-700 p-2"
+              <button
+                onClick={() => handleDeleteProduct(service.id)}
+                className="cursor-pointer text-red-600 hover:text-red-700 p-2"
               >
                 <Trash2 className="h-4 w-4" />
-              </button> */}
+              </button>
             </div>
             <p className="text-sm text-slate-600 mb-4">{service.description}</p>
             <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-              <p className="text-xl font-bold text-rose-600">${service.price}</p>
+              <p className="text-xl font-bold text-rose-600">€{service.price}</p>
               <p className="text-sm text-slate-500">{service.duration}</p>
             </div>
           </div>
@@ -67,12 +98,37 @@ const ServicesPage = () => {
           <p className="text-slate-400 text-sm mt-1">Click "Add Service" to get started</p>
         </div>
       )}
-
+      {showModal && (
+        <ShowModal
+          text={'Are you sure you want to delete service?'}
+          handleProceedClick={() => {
+            handleProceedClick();
+          }}
+          handleCancelClick={() => {
+            setShowModal(false);
+            setServiceIdToDelete(null);
+          }}
+        />
+      )}
       {/* Add Service Modal */}
       <AnimatePresence>
         {globalContext.showAddServicesModal && <AddServicesModal />}
       </AnimatePresence>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        theme="colored"
+        toastStyle={{
+          fontSize: '14px',
+        }}
+      />
     </div>
   );
 };
-export default ServicesPage;
+
+export default ServicesPage

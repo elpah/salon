@@ -1,3 +1,5 @@
+import type { QueryObserverResult } from "@tanstack/react-query";
+
 export interface Product {
   id: string;
   name: string;
@@ -12,4 +14,5 @@ export interface UseProductsResult {
   data: Product[] | undefined;
   isLoading: boolean;
   isError: boolean;
+  refetch: () => Promise<QueryObserverResult<Product[], Error>>;
 }

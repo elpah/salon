@@ -8,7 +8,7 @@ const deleteService = async (serviceId: string) => {
 
   //   const token = await user.getIdToken();
 
-  const response = await axios.delete(`${import.meta.env.VITE_API_URL}delete-service/${serviceId}`, {
+  const response = await axios.delete(`${import.meta.env.VITE_API_URL}/delete-service/${serviceId}`, {
     headers: {
       //   Authorization: `Bearer ${token}`,
     },
