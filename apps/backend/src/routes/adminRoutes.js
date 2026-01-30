@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getAllProducts,
   getProductById,
+  deleteProductById,
 } from "../services/admin-services/product.services.js";
 
 import {
@@ -50,6 +51,24 @@ adminRoute.get("/products/:id", async (req, res) => {
     const product = await getProductById(id);
     res.status(200).json(product);
   } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+adminRoute.delete("/delete-product/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await deleteProductById(id);
+    if (result.success) {
+		console.log("success")
+      res.status(200).json({ message: "Product deleted successfully" });
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error deleting product:", err);
+    }
     res.status(500).send("Internal Server Error");
   }
 });

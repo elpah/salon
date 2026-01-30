@@ -84,4 +84,41 @@ const getProductById = async (id) => {
   }
 };
 
-export { addNewProduct, getAllProducts, getProductById };
+const deleteProductById = async (id) => {
+  const client = await connectToDatabase();
+  const session = client.startSession();
+
+  try {
+    const db = client.db();
+    const productCol = db.collection("products");
+    const deletedCol = db.collection("deleted-products");
+
+    await session.withTransaction(async () => {
+      const product = await productCol.findOne(
+        { id: id },
+        { projection: { _id: 0 }, session },
+      );
+      if (!product) {
+        throw new Error("Failed to retrieve product for deletion");
+      }
+
+      const insertToDelete = await deletedCol.insertOne(product, { session });
+      if (!insertToDelete.acknowledged) {
+        throw new Error("Failed to add deleted product to trash");
+      }
+
+      await productCol.deleteOne({ id: productId }, { session });
+    });
+
+    return { success: true, message: "Product deleted successfully." };
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error deleting product:", err.message);
+    }
+    return { success: false, message: err.message };
+  } finally {
+    await session.endSession();
+  }
+};
+
+export { addNewProduct, getAllProducts, getProductById, deleteProductById };
