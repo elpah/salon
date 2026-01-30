@@ -85,40 +85,88 @@ const getProductById = async (id) => {
 };
 
 const deleteProductById = async (id) => {
-  const client = await connectToDatabase();
-  const session = client.startSession();
-
   try {
-    const db = client.db();
+    const db = await connectToDatabase();
+
     const productCol = db.collection("products");
     const deletedCol = db.collection("deleted-products");
 
-    await session.withTransaction(async () => {
-      const product = await productCol.findOne(
-        { id: id },
-        { projection: { _id: 0 }, session },
-      );
-      if (!product) {
-        throw new Error("Failed to retrieve product for deletion");
-      }
+    const product = await productCol.findOne(
+      { id },
+      { projection: { _id: 0 } },
+    );
 
-      const insertToDelete = await deletedCol.insertOne(product, { session });
-      if (!insertToDelete.acknowledged) {
-        throw new Error("Failed to add deleted product to trash");
-      }
+    if (!product) {
+      return { success: false, message: "Product not found" };
+    }
 
-      await productCol.deleteOne({ id: productId }, { session });
-    });
+    await deletedCol.insertOne(product);
+    await productCol.deleteOne({ id });
 
     return { success: true, message: "Product deleted successfully." };
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error deleting product:", err.message);
-    }
+    console.error("Error deleting product:", err);
     return { success: false, message: err.message };
-  } finally {
-    await session.endSession();
   }
 };
 
-export { addNewProduct, getAllProducts, getProductById, deleteProductById };
+const permanentlyDeleteProductById = async (id) => {
+  try {
+    const db = await connectToDatabase();
+    const deletedCol = db.collection("deleted-products");
+
+    const result = await deletedCol.findOneAndDelete({ id });
+
+    if (!result.value) {
+      return { success: false, message: "Product not found" };
+    }
+
+    return {
+      success: true,
+      message: "Product permanently deleted successfully",
+    };
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error permanently deleting product:", err);
+    }
+    return {
+      success: false,
+      message: "Failed to permanently delete product",
+    };
+  }
+};
+
+export const restoreDeletedProductByID = async (id) => {
+  try {
+    const db = await connectToDatabase();
+    const productCol = db.collection("products");
+    const deletedCol = db.collection("deleted-products");
+    const result = await deletedCol.findOneAndDelete({ id });
+
+    if (!result.value) {
+      return { success: false, message: "Product not found" };
+    }
+    await productCol.insertOne(result.value);
+    return {
+      success: true,
+      message: "Product restored successfully",
+    };
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error restoring product:", err);
+    }
+    return {
+      success: false,
+      message: "Failed to restore product",
+    };
+  }
+};
+
+export {
+  addNewProduct,
+  getAllProducts,
+  getProductById,
+  deleteProductById,
+  permanentlyDeleteProductById,
+  restoreDeletedProductByID
+};
