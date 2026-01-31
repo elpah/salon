@@ -1,4 +1,4 @@
-import type { QueryObserverResult } from '@tanstack/react-query';
+import type { QueryObserverResult } from "@tanstack/react-query";
 
 export interface AvailabilityWindow {
   id: string;
@@ -8,6 +8,7 @@ export interface AvailabilityWindow {
   slotMinutes: number;
   bufferMinutes: number;
 }
+
 
 export interface UseAvailabilityResult {
   data: AvailabilityWindow[] | undefined;

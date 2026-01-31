@@ -18,6 +18,7 @@ import {
   createAvailabilityWindow,
   getAllAvailabilities,
   deleteAvailabilityById,
+  getBookedSlots,
 } from "../services/admin-services/availability.services.js";
 
 const adminRoute = Router();
@@ -226,4 +227,14 @@ adminRoute.delete("/delete-availability/:id", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+adminRoute.get("/booked-slots", async (_req, res) => {
+  try {
+    const bookedSlots = await getBookedSlots();
+    res.status(200).json(bookedSlots);
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 export default adminRoute;

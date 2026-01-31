@@ -1,31 +1,51 @@
+import useGetAvailabilities from '@/hooks/useGetAvailabilities';
 import { SERVICES } from '@salon/data';
-import { useServices } from '@salon/hooks';
+import { useServices, useGetBookedSlots } from '@salon/hooks';
+import { AvailabilityWindow, BookedSlot } from '@salon/types';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+interface AvailableTime {
+  label: string; // "6:00 AM - 6:30 AM"
+  duration: number; // 30 minutes
+}
+
+interface AvailableSlotByDate {
+  date: string;
+  times: AvailableTime[];
+}
+
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [clientDetails, setClientDetails] = useState({
-    name: '',
-    email: '',
-    phone: '',
-  });
-  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const [selectedTime, setSelectedTime] = useState<AvailableTime | null>(null);
+  const [clientDetails, setClientDetails] = useState({ name: '', email: '', phone: '' });
 
-  if (isLoading) {
+  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const {
+    data: availabilityWindow,
+    isLoading: availabilityIsLoading,
+    isError: availabilityIsError,
+  } = useGetAvailabilities(apiUrl);
+  const {
+    data: bookedSlots,
+    isLoading: bookedSlotsIsLoading,
+    isError: bookedSlotsIsError,
+  } = useGetBookedSlots(apiUrl);
+
+  if (isLoading || bookedSlotsIsLoading || availabilityIsLoading) {
     return (
       <div className="text-center py-16">
         <p className="text-slate-500">Loading Services...</p>
       </div>
     );
   }
-  if (isError) {
+
+  if (isError || availabilityIsError || bookedSlotsIsError) {
     return (
       <div className="text-center py-16">
         <p className="text-red-500">Failed to load services. Please try again.</p>
@@ -33,53 +53,96 @@ const BookAppointment = () => {
     );
   }
 
-  const availableSlots = [
-    {
-      date: '2024-01-19',
-      times: ['10:00 AM - 11:00 AM', '1:00 PM - 2:00 PM', '2:30 PM - 3:30 PM', '4:00 PM - 5:00 PM'],
-    },
-    {
-      date: '2024-01-20',
-      times: [
-        '9:00 AM - 10:00 AM',
-        '11:30 AM - 12:30 PM',
-        '2:00 PM - 3:00 PM',
-        '5:00 PM - 6:00 PM',
-      ],
-    },
-    {
-      date: '2024-01-21',
-      times: ['10:00 AM - 11:00 AM', '1:30 PM - 2:30 PM', '3:00 PM - 4:00 PM'],
-    },
-    {
-      date: '2024-01-22',
-      times: ['9:30 AM - 10:30 AM', '12:00 PM - 1:00 PM', '3:30 PM - 4:30 PM', '5:30 PM - 6:30 PM'],
-    },
-    {
-      date: '2024-01-23',
-      times: ['10:00 AM - 11:00 AM', '2:00 PM - 3:00 PM', '4:00 PM - 5:00 PM'],
-    },
-  ]; // I will fetch this data from a backend; add booked key with value yes/no to distinguish between available and unavalable slots.
+  const formatTime = (time: string) => {
+    const [hourStr, minuteStr] = time.split(':');
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    if (hour === 0) hour = 12;
+    if (hour > 12) hour -= 12;
+    return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+  };
+
+  const getAvailableSlots = (
+    availabilityWindows: AvailabilityWindow[],
+    bookedSlots: BookedSlot[]
+  ): AvailableSlotByDate[] => {
+    const slotsByDate: Record<string, AvailableTime[]> = {};
+
+    const splitWindow = (
+      startTime: string,
+      endTime: string,
+      slotMinutes: number,
+      bufferMinutes: number
+    ): AvailableTime[] => {
+      const result: AvailableTime[] = [];
+      let [startH, startM] = startTime.split(':').map(Number);
+      const [endH, endM] = endTime.split(':').map(Number);
+
+      let current = new Date();
+      current.setHours(startH, startM, 0, 0);
+
+      const end = new Date();
+      end.setHours(endH, endM, 0, 0);
+
+      while (current.getTime() + slotMinutes * 60000 <= end.getTime()) {
+        const slotStart = formatTime(`${current.getHours()}:${current.getMinutes()}`);
+        const slotEndDate = new Date(current.getTime() + slotMinutes * 60000);
+        const slotEnd = formatTime(`${slotEndDate.getHours()}:${slotEndDate.getMinutes()}`);
+        result.push({ label: `${slotStart} - ${slotEnd}`, duration: slotMinutes });
+        current = new Date(slotEndDate.getTime() + bufferMinutes * 60000);
+      }
+
+      return result;
+    };
+
+    availabilityWindows.forEach(window => {
+      if (!slotsByDate[window.date]) slotsByDate[window.date] = [];
+
+      const splitTimes = splitWindow(
+        window.startTime,
+        window.endTime,
+        window.slotMinutes,
+        window.bufferMinutes
+      );
+
+      const freeTimes = splitTimes.filter(slot => {
+        return !bookedSlots.some(
+          b =>
+            b.date === window.date &&
+            `${formatTime(b.startTime)} - ${formatTime(b.endTime)}` === slot.label
+        );
+      });
+
+      slotsByDate[window.date].push(...freeTimes);
+    });
+
+    return Object.entries(slotsByDate)
+      .map(([date, times]) => ({ date, times }))
+      .sort((a, b) => (a.date > b.date ? 1 : -1));
+  };
+
+  const availableSlots = getAvailableSlots(availabilityWindow!, bookedSlots!);
   const selectedSlot = availableSlots.find(slot => slot.date === selectedDate);
-  const availableTimes = selectedSlot ? selectedSlot.times : [];
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
+      year: 'numeric',
     });
   };
 
-  // @return
   return (
     <div className="pt-24 pb-24 bg-slate-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+          {/* Step Indicator */}
           <div className="bg-slate-900 p-8 md:p-12 text-white">
             <h1 className="text-3xl font-serif font-bold mb-4">Book Your Transformation</h1>
             <p className="text-slate-400 text-sm">Secure your appointment in just a few clicks.</p>
-
             <div className="flex mt-8 space-x-4">
               {[1, 2, 3, 4].map(s => (
                 <div key={s} className="flex items-center">
@@ -98,18 +161,11 @@ const BookAppointment = () => {
             </div>
           </div>
 
+          {/* Step Content */}
           <div className="p-8 md:p-12">
+            {/* Step 1: Select Service */}
             {step === 1 && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-              >
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Select a Service</h3>
                 <div className="space-y-4">
                   {services?.map(service => (
@@ -141,17 +197,9 @@ const BookAppointment = () => {
             )}
 
             {step === 2 && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-              >
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Choose Date & Time</h3>
+
                 <div className="mb-8">
                   <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
                     Select a Date
@@ -162,7 +210,7 @@ const BookAppointment = () => {
                         key={slot.date}
                         onClick={() => {
                           setSelectedDate(slot.date);
-                          setSelectedTime('');
+                          setSelectedTime(null);
                         }}
                         className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${selectedDate === slot.date ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
                       >
@@ -172,20 +220,29 @@ const BookAppointment = () => {
                   </div>
                 </div>
 
-                {selectedDate && (
+                {/* Select Time */}
+                {selectedDate && selectedSlot && (
                   <div className="mb-8">
                     <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
                       Available Time Slots
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {availableTimes.map(time => (
-                        <button
-                          key={time}
-                          onClick={() => setSelectedTime(time)}
-                          className={`py-3 px-4 rounded-lg border-2 text-sm font-bold transition-all ${selectedTime === time ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
-                        >
-                          {time}
-                        </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {selectedSlot.times.map(slot => (
+                        <div key={slot.label} className="flex flex-col">
+                          <div
+                            onClick={() => setSelectedTime(slot)}
+                            className={`py-3 px-4 rounded-lg border-2 flex flex-col gap-1 text-sm  transition-all cursor-pointer ${
+                              selectedTime?.label === slot.label
+                                ? 'border-rose-600 bg-rose-50 text-rose-600'
+                                : 'border-slate-100 hover:border-slate-200 text-slate-600'
+                            }`}
+                          >
+                            <span className='font-bold'> {slot.label}</span>
+                            <span className="text-xs text-slate-400">
+                              Duration: {slot.duration} minutes
+                            </span>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -210,16 +267,7 @@ const BookAppointment = () => {
             )}
 
             {step === 3 && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-              >
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Your Details</h3>
                 <div className="space-y-4 mb-8">
                   <div>
@@ -229,12 +277,7 @@ const BookAppointment = () => {
                     <input
                       type="text"
                       value={clientDetails.name}
-                      onChange={e =>
-                        setClientDetails({
-                          ...clientDetails,
-                          name: e.target.value,
-                        })
-                      }
+                      onChange={e => setClientDetails({ ...clientDetails, name: e.target.value })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
                       placeholder="John Doe"
                       required
@@ -248,12 +291,7 @@ const BookAppointment = () => {
                     <input
                       type="email"
                       value={clientDetails.email}
-                      onChange={e =>
-                        setClientDetails({
-                          ...clientDetails,
-                          email: e.target.value,
-                        })
-                      }
+                      onChange={e => setClientDetails({ ...clientDetails, email: e.target.value })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
                       placeholder="john@example.com"
                       required
@@ -267,12 +305,7 @@ const BookAppointment = () => {
                     <input
                       type="tel"
                       value={clientDetails.phone}
-                      onChange={e =>
-                        setClientDetails({
-                          ...clientDetails,
-                          phone: e.target.value,
-                        })
-                      }
+                      onChange={e => setClientDetails({ ...clientDetails, phone: e.target.value })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
                       placeholder="(555) 123-4567"
                       required
@@ -297,18 +330,8 @@ const BookAppointment = () => {
                 </div>
               </motion.div>
             )}
-
             {step === 4 && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-              >
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <div className="text-center py-8">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-rose-100 text-rose-600 mb-6">
                     <CheckCircle className="h-10 w-10" />
@@ -343,7 +366,9 @@ const BookAppointment = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Time</span>
-                      <span className="font-bold text-slate-900">{selectedTime}</span>
+                      <span className="font-bold text-slate-900">
+                        {selectedTime?.label} ({selectedTime?.duration} min)
+                      </span>
                     </div>
                   </div>
 
@@ -356,7 +381,6 @@ const BookAppointment = () => {
                     </button>
                     <button
                       onClick={() =>
-                        // Here i will handle completed booking. send to a backend, edit slot field to booked. maybe add to user profile(Optional)
                         alert('Booking Successful! You will receive a confirmation email shortly.')
                       }
                       className="flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"

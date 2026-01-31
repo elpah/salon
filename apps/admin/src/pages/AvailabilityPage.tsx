@@ -7,6 +7,7 @@ import useGetAvailability from '../hooks/useGetAvailability';
 import useDeleteAvailability from '../hooks/useDeleteAvailability';
 import ShowModal from '../components/modal/ShowModal';
 import { toast } from 'react-toastify';
+import type { AvailabilityWindow } from '@salon/types';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -62,7 +63,7 @@ const AvailabilityPage = () => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {availabilities?.map(slot => (
+        {availabilities?.map((slot:AvailabilityWindow) => (
           <motion.div
             key={slot.id}
             initial={{

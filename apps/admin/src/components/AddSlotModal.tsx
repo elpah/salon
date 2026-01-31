@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
-import type { AvailabilityWindow } from '../types/availabilityWindow.type';
+import type { AvailabilityWindow } from '@salon/types';
 import useCreateAvailability from '../hooks/useCreateNewAvailability';
 import { toast } from 'react-toastify';
 import { useQueryClient } from '@tanstack/react-query';
