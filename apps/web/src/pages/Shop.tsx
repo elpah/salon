@@ -44,7 +44,7 @@ const Shop = () => {
             {['all', 'wigs', 'equipment', 'care'].map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat as any)}
+                onClick={() => setActiveCategory(cat as 'all' | 'wigs' | 'equipment' | 'care')}
                 className={`px-2 sm:px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === cat ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 {cat}

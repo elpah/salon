@@ -9,8 +9,8 @@ import { useState } from 'react';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface AvailableTime {
-  label: string; // "6:00 AM - 6:30 AM"
-  duration: number; // 30 minutes
+  label: string;
+  duration: number;
 }
 
 interface AvailableSlotByDate {
@@ -76,7 +76,7 @@ const BookAppointment = () => {
       bufferMinutes: number
     ): AvailableTime[] => {
       const result: AvailableTime[] = [];
-      let [startH, startM] = startTime.split(':').map(Number);
+      const [startH, startM] = startTime.split(':').map(Number);
       const [endH, endM] = endTime.split(':').map(Number);
 
       let current = new Date();
@@ -199,27 +199,38 @@ const BookAppointment = () => {
             {step === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Choose Date & Time</h3>
-
                 <div className="mb-8">
-                  <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
-                    Select a Date
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {availableSlots.map(slot => (
-                      <button
-                        key={slot.date}
-                        onClick={() => {
-                          setSelectedDate(slot.date);
-                          setSelectedTime(null);
-                        }}
-                        className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${selectedDate === slot.date ? 'border-rose-600 bg-rose-50 text-rose-600' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
-                      >
-                        {formatDate(slot.date)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  {availableSlots.length === 0 ? (
+                    <div className="text-md text-slate-600 italic rounded-lg p-4 text-center">
+                      No time slots available. Please check again later.
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
+                        Select a Date
+                      </p>
 
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {availableSlots.map(slot => (
+                          <button
+                            key={slot.date}
+                            onClick={() => {
+                              setSelectedDate(slot.date);
+                              setSelectedTime(null);
+                            }}
+                            className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
+                              selectedDate === slot.date
+                                ? 'border-rose-600 bg-rose-50 text-rose-600'
+                                : 'border-slate-100 hover:border-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {formatDate(slot.date)}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
                 {/* Select Time */}
                 {selectedDate && selectedSlot && (
                   <div className="mb-8">
@@ -237,7 +248,7 @@ const BookAppointment = () => {
                                 : 'border-slate-100 hover:border-slate-200 text-slate-600'
                             }`}
                           >
-                            <span className='font-bold'> {slot.label}</span>
+                            <span className="font-bold"> {slot.label}</span>
                             <span className="text-xs text-slate-400">
                               Duration: {slot.duration} minutes
                             </span>

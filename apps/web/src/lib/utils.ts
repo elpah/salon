@@ -21,3 +21,11 @@ export function removeDarkClasses(className: string): string {
     .filter(cls => !cls.startsWith('dark:'))
     .join(' ');
 }
+
+export const NAV_LINKS = [
+  { name: 'Home', path: '/' },
+  { name: 'Services', path: '/services' },
+  { name: 'Shop', path: '/shop' },
+  { name: 'About', path: '/about' },
+  { name: 'Contact', path: '/contact' },
+];

@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Scissors, X, Menu } from 'lucide-react';
-
-export const NAV_LINKS = [
-  { name: 'Home', path: '/' },
-  { name: 'Services', path: '/services' },
-  { name: 'Shop', path: '/shop' },
-  { name: 'About', path: '/about' },
-  { name: 'Contact', path: '/contact' },
-];
+import { NAV_LINKS } from '@/lib/utils';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

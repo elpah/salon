@@ -1,7 +1,7 @@
+import { NAV_LINKS } from '@/lib/utils';
 import { Scissors, Instagram, Facebook, Twitter, MapPin, Phone, Clock } from 'lucide-react';
 import { SiTiktok } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
-import { NAV_LINKS } from './Navbar';
 
 const Footer = () => {
   const navigate = useNavigate();

@@ -10,7 +10,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Shop = lazy(() => import('./pages/Shop'));
 const BookAppointment = lazy(() => import('./pages/BookAppointment'));
 
-let theme: Theme = 'light';
+const theme: Theme = 'light';
 
 function App() {
   const { pathname } = useLocation();

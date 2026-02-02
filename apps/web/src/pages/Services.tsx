@@ -1,4 +1,3 @@
-import { SERVICES } from '@salon/data';
 import { Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +47,9 @@ const Services = () => {
           {['all', 'styling', 'color', 'treatment', 'extensions'].map(cat => (
             <button
               key={cat}
-              onClick={() => setFilter(cat as any)}
+              onClick={() =>
+                setFilter(cat as 'all' | 'styling' | 'color' | 'treatment' | 'extensions')
+              }
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === cat ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
