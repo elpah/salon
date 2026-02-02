@@ -13,6 +13,7 @@ import {
   deleteServiceById,
   permanentlyDeleteServiceById,
   restoreDeletedServiceById,
+  addNewService,
 } from "../services/admin-services/service.services.js";
 import {
   createAvailabilityWindow,
@@ -202,6 +203,25 @@ adminRoute.post("/create-new-availability", async (req, res) => {
     });
   }
 });
+
+adminRoute.post("/create-new-service", async (req, res) => {
+  try {
+    // console.log("Received data:", req.body);
+    const insertedId = await addNewService(req.body);
+    console.log();
+    return res.status(201).json({
+      message: "Service created successfully",
+      id: insertedId,
+    });
+  } catch (err) {
+    console.error("Error in /create-new-service:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+
 adminRoute.get("/availabilities", async (_req, res) => {
   try {
     const availabilities = await getAllAvailabilities();
