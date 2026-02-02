@@ -6,8 +6,8 @@ import AddSlotModal from '../components/AddSlotModal';
 import useGetAvailability from '../hooks/useGetAvailability';
 import useDeleteAvailability from '../hooks/useDeleteAvailability';
 import ShowModal from '../components/modal/ShowModal';
-import { toast } from 'react-toastify';
 import type { AvailabilityWindow } from '@salon/types';
+import { notifyError, notifySuccess } from '../lib/utils';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -16,13 +16,6 @@ const AvailabilityPage = () => {
   const [avaibabilityIdToDelete, setAvaibabilityIdToDelete] = useState<string | null>(null);
   const { data: availabilities, isLoading, isError, refetch } = useGetAvailability(apiUrl);
   const { mutate: deleteAvailability } = useDeleteAvailability();
-
-  const notifySuccess = () => {
-    toast.success('Product Deleted Successfully.', {});
-  };
-  const notifyError = (message: string) => {
-    toast.error(message, {});
-  };
 
   const handleDeleteAvailability = (id: string) => {
     setAvaibabilityIdToDelete(id);
@@ -34,12 +27,11 @@ const AvailabilityPage = () => {
     if (!avaibabilityIdToDelete) return;
     deleteAvailability(avaibabilityIdToDelete!, {
       onSuccess: () => {
-        notifySuccess();
+        notifySuccess('Product Deleted Successfully.');
         refetch();
       },
-      onError: (error: any) => {
-        console.log(error);
-        notifyError(error.message);
+      onError: (error: unknown) => {
+        notifyError('Error Deleting product');
       },
     });
     setAvaibabilityIdToDelete(null);
@@ -63,7 +55,7 @@ const AvailabilityPage = () => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {availabilities?.map((slot:AvailabilityWindow) => (
+        {availabilities?.map((slot: AvailabilityWindow) => (
           <motion.div
             key={slot.id}
             initial={{

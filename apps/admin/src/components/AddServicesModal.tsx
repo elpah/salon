@@ -56,7 +56,7 @@ const AddServicesModal = () => {
           });
           globalContext.setshowAddServicesModal(false);
         },
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           notifyError('Something went wrong while submitting.');
           if (import.meta.env.VITE_NODE_ENV !== 'production') {
             console.error(err);

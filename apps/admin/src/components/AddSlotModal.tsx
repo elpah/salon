@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
 import type { AvailabilityWindow } from '@salon/types';
 import useCreateAvailability from '../hooks/useCreateNewAvailability';
-import { toast } from 'react-toastify';
 import { useQueryClient } from '@tanstack/react-query';
+import { notifyError, notifySuccess } from '../lib/utils';
 
 const AddSlotModal = () => {
   const globalContext = useContext(GlobalContext);
@@ -20,13 +20,6 @@ const AddSlotModal = () => {
     slotMinutes: 30,
     bufferMinutes: 10,
   });
-  const notifySuccess = (message: string) => {
-    toast.success(message, {});
-  };
-
-  const notifyError = (message: string) => {
-    toast.error(message, {});
-  };
   const handleAddSlot = () => {
     if (
       newSlot.date &&

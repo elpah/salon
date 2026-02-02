@@ -6,9 +6,9 @@ import AddProductModal from '../components/AddProductModal';
 import { useProducts } from '@salon/hooks';
 import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ShowModal from '../components/modal/ShowModal';
+import { notifySuccess, notifyError } from '../lib/utils';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {
@@ -18,32 +18,25 @@ const ProductsPage = () => {
 
   const { mutate: deleteProduct } = useDeleteProduct();
 
-  const notifySuccess = () => {
-    toast.success('Product Deleted Successfully.', {});
-  };
-  const notifyError = (message: string) => {
-    toast.error(message, {});
-  };
-
   const handleDeleteProduct = (id: string) => {
     setProductIdToDelete(id);
     globalContext.setShowConfirmationModal(true);
   };
 
   const handleProceedClick = () => {
-    globalContext.setShowConfirmationModal;
+    globalContext.setShowConfirmationModal(true);
     if (!productIdToDelete) return;
     deleteProduct(productIdToDelete!, {
       onSuccess: () => {
-        notifySuccess();
+        notifySuccess('Product Deleted Successfully.');
         refetch();
       },
-      onError: (error: any) => {
-        console.log(error);
-        notifyError(error.message);
+      onError: (_error: unknown) => {
+        notifyError('Error Deleting');
       },
     });
     setProductIdToDelete(null);
+    globalContext.setShowConfirmationModal(false);
   };
 
   if (isLoading) {
@@ -104,26 +97,12 @@ const ProductsPage = () => {
             handleProceedClick();
           }}
           handleCancelClick={() => {
-            globalContext.setShowConfirmationModal;
+            globalContext.setShowConfirmationModal(false);
             setProductIdToDelete(null);
           }}
         />
       )}
-      {/* Add Product Modal */}
       <AnimatePresence>{globalContext.showAddProductModal && <AddProductModal />}</AnimatePresence>
-      {/* <ToastContainer
-        position="bottom-right"
-        autoClose={1500}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        theme="colored"
-        toastStyle={{
-          fontSize: '14px',
-        }}
-      /> */}
     </div>
   );
 };

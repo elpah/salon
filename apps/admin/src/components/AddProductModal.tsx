@@ -18,7 +18,7 @@ const AddProductModal = () => {
     if (newProduct.name && newProduct.price > 0) {
       const product: Product = {
         id: Date.now().toString(),
-        image:"some image",
+        image: 'some image',
         ...newProduct,
       };
       globalContext.setProducts([...globalContext.products, product]);

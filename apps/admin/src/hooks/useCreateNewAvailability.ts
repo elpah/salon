@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import type { AvailabilityWindow } from '@salon/types';
 
-
 const useCreateNewAvailability = () => {
   return useMutation({
     mutationFn: async (newSlot: AvailabilityWindow) => {

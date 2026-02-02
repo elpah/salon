@@ -7,7 +7,7 @@ import { useServices } from '@salon/hooks';
 import ShowModal from '../components/modal/ShowModal';
 // import 'react-toastify/dist/ReactToastify.css';
 import useDeleteService from '../hooks/useDeleteService';
-import { notifyError,notifySuccess } from '../lib/utils';
+import { notifyError, notifySuccess } from '../lib/utils';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -31,9 +31,8 @@ const ServicesPage = () => {
         notifySuccess('Product Deleted Successfully');
         refetch();
       },
-      onError: (error: any) => {
-        console.log(error);
-        notifyError(error.message);
+      onError: (_error: unknown) => {
+        notifyError('Error Deleting');
       },
     });
     setServiceIdToDelete(null);
@@ -111,4 +110,3 @@ const ServicesPage = () => {
 };
 
 export default ServicesPage;
-

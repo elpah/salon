@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import type {  AvailabilityWindow , UseAvailabilityResult } from '@salon/types';
+import type { AvailabilityWindow, UseAvailabilityResult } from '@salon/types';
 
 const fetchAvailabilityWindow = async (apiUrl: string): Promise<AvailabilityWindow[]> => {
   const res = await axios.get<AvailabilityWindow[]>(`${apiUrl}/availabilities`);
