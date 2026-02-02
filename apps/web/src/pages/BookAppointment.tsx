@@ -1,15 +1,21 @@
 import useGetAvailabilities from '@/hooks/useGetAvailabilities';
-import { SERVICES } from '@salon/data';
 import { useServices, useGetBookedSlots } from '@salon/hooks';
 import { AvailabilityWindow, BookedSlot } from '@salon/types';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+type SelectedSlot = {
+  date: string;
+  startTime: string;
+  endTime: string;
+};
+
 interface AvailableTime {
-  label: string;
+  startTime: string;
+  endTime: string;
   duration: number;
 }
 
@@ -18,49 +24,101 @@ interface AvailableSlotByDate {
   times: AvailableTime[];
 }
 
+type BookingState = {
+  selectedService: string | null;
+  selectedDate: string;
+  selectedSlot: SelectedSlot | null;
+  clientDetails: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+};
+
+type ClientField = keyof BookingState['clientDetails'];
+
+type BookingAction =
+  | { type: 'SET_SERVICE'; payload: string | null }
+  | { type: 'SET_DATE'; payload: string }
+  | { type: 'SET_SLOT'; payload: SelectedSlot | null }
+  | { type: 'SET_CLIENT_DETAILS'; payload: { field: ClientField; value: string } }
+  | { type: 'RESET' };
+
+const initialBookingState: BookingState = {
+  selectedService: null,
+  selectedDate: '',
+  selectedSlot: null,
+  clientDetails: { name: '', email: '', phone: '' },
+};
+
+function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+  switch (action.type) {
+    case 'SET_SERVICE':
+      return { ...state, selectedService: action.payload };
+    case 'SET_DATE':
+      return { ...state, selectedDate: action.payload, selectedSlot: null };
+    case 'SET_SLOT':
+      return { ...state, selectedSlot: action.payload };
+    case 'SET_CLIENT_DETAILS':
+      return {
+        ...state,
+        clientDetails: { ...state.clientDetails, [action.payload.field]: action.payload.value },
+      };
+    case 'RESET':
+      return initialBookingState;
+    default:
+      return state;
+  }
+}
+
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<AvailableTime | null>(null);
-  const [clientDetails, setClientDetails] = useState({ name: '', email: '', phone: '' });
+  const [state, dispatch] = useReducer(bookingReducer, initialBookingState);
 
   const { data: services, isLoading, isError } = useServices(apiUrl);
-  const {
-    data: availabilityWindow,
-    isLoading: availabilityIsLoading,
-    isError: availabilityIsError,
-  } = useGetAvailabilities(apiUrl);
-  const {
-    data: bookedSlots,
-    isLoading: bookedSlotsIsLoading,
-    isError: bookedSlotsIsError,
-  } = useGetBookedSlots(apiUrl);
+  const { data: availabilityWindow, isLoading: availabilityIsLoading } =
+    useGetAvailabilities(apiUrl);
+  const { data: bookedSlots, isLoading: bookedSlotsIsLoading } = useGetBookedSlots(apiUrl);
 
-  if (isLoading || bookedSlotsIsLoading || availabilityIsLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading Services...</p>
-      </div>
-    );
+  if (isLoading || availabilityIsLoading || bookedSlotsIsLoading) {
+    return <p className="text-center py-16 text-slate-500">Loading...</p>;
   }
 
-  if (isError || availabilityIsError || bookedSlotsIsError) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-red-500">Failed to load services. Please try again.</p>
-      </div>
-    );
-  }
+  const pad = (n: number) => n.toString().padStart(2, '0');
 
   const formatTime = (time: string) => {
-    const [hourStr, minuteStr] = time.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = parseInt(minuteStr, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    if (hour === 0) hour = 12;
-    if (hour > 12) hour -= 12;
-    return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+    const [h, m] = time.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour = h % 12 || 12;
+    return `${hour}:${pad(m)} ${ampm}`;
+  };
+
+  const splitWindow = (
+    startTime: string,
+    endTime: string,
+    slotMinutes: number,
+    bufferMinutes: number
+  ): AvailableTime[] => {
+    const result: AvailableTime[] = [];
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    let current = new Date();
+    current.setHours(startH, startM, 0, 0);
+
+    const end = new Date();
+    end.setHours(endH, endM, 0, 0);
+
+    while (current.getTime() + slotMinutes * 60000 <= end.getTime()) {
+      const start = `${pad(current.getHours())}:${pad(current.getMinutes())}`;
+      const endDate = new Date(current.getTime() + slotMinutes * 60000);
+      const endTimeStr = `${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
+
+      result.push({ startTime: start, endTime: endTimeStr, duration: slotMinutes });
+      current = new Date(endDate.getTime() + bufferMinutes * 60000);
+    }
+
+    return result;
   };
 
   const getAvailableSlots = (
@@ -69,36 +127,7 @@ const BookAppointment = () => {
   ): AvailableSlotByDate[] => {
     const slotsByDate: Record<string, AvailableTime[]> = {};
 
-    const splitWindow = (
-      startTime: string,
-      endTime: string,
-      slotMinutes: number,
-      bufferMinutes: number
-    ): AvailableTime[] => {
-      const result: AvailableTime[] = [];
-      const [startH, startM] = startTime.split(':').map(Number);
-      const [endH, endM] = endTime.split(':').map(Number);
-
-      let current = new Date();
-      current.setHours(startH, startM, 0, 0);
-
-      const end = new Date();
-      end.setHours(endH, endM, 0, 0);
-
-      while (current.getTime() + slotMinutes * 60000 <= end.getTime()) {
-        const slotStart = formatTime(`${current.getHours()}:${current.getMinutes()}`);
-        const slotEndDate = new Date(current.getTime() + slotMinutes * 60000);
-        const slotEnd = formatTime(`${slotEndDate.getHours()}:${slotEndDate.getMinutes()}`);
-        result.push({ label: `${slotStart} - ${slotEnd}`, duration: slotMinutes });
-        current = new Date(slotEndDate.getTime() + bufferMinutes * 60000);
-      }
-
-      return result;
-    };
-
     availabilityWindows.forEach(window => {
-      if (!slotsByDate[window.date]) slotsByDate[window.date] = [];
-
       const splitTimes = splitWindow(
         window.startTime,
         window.endTime,
@@ -106,34 +135,32 @@ const BookAppointment = () => {
         window.bufferMinutes
       );
 
-      const freeTimes = splitTimes.filter(slot => {
-        return !bookedSlots.some(
-          b =>
-            b.date === window.date &&
-            `${formatTime(b.startTime)} - ${formatTime(b.endTime)}` === slot.label
-        );
-      });
+      const freeTimes = splitTimes.filter(
+        slot =>
+          !bookedSlots.some(
+            b =>
+              b.date === window.date && b.startTime === slot.startTime && b.endTime === slot.endTime
+          )
+      );
 
-      slotsByDate[window.date].push(...freeTimes);
+      slotsByDate[window.date] = freeTimes;
     });
 
     return Object.entries(slotsByDate)
       .map(([date, times]) => ({ date, times }))
-      .sort((a, b) => (a.date > b.date ? 1 : -1));
+      .sort((a, b) => a.date.localeCompare(b.date));
   };
 
   const availableSlots = getAvailableSlots(availabilityWindow!, bookedSlots!);
-  const selectedSlot = availableSlots.find(slot => slot.date === selectedDate);
+  const selectedSlotDay = availableSlots.find(s => s.date === state.selectedDate);
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     });
-  };
 
   return (
     <div className="pt-24 pb-24 bg-slate-50 min-h-screen">
@@ -147,7 +174,11 @@ const BookAppointment = () => {
               {[1, 2, 3, 4].map(s => (
                 <div key={s} className="flex items-center">
                   <div
-                    className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${step >= s ? 'bg-rose-600 border-rose-600' : 'bg-transparent border-slate-700 text-slate-600'}`}
+                    className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+                      step >= s
+                        ? 'bg-rose-600 border-rose-600'
+                        : 'bg-transparent border-slate-700 text-slate-600'
+                    }`}
                   >
                     {s}
                   </div>
@@ -171,8 +202,12 @@ const BookAppointment = () => {
                   {services?.map(service => (
                     <div
                       key={service.id}
-                      onClick={() => setSelectedService(service.id)}
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex justify-between items-center ${selectedService === service.id ? 'border-rose-600 bg-rose-50' : 'border-slate-100 hover:border-slate-200'}`}
+                      onClick={() => dispatch({ type: 'SET_SERVICE', payload: service.id })}
+                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex justify-between items-center ${
+                        state.selectedService === service.id
+                          ? 'border-rose-600 bg-rose-50'
+                          : 'border-slate-100 hover:border-slate-200'
+                      }`}
                     >
                       <div>
                         <p className="font-bold text-slate-900">{service.name}</p>
@@ -180,14 +215,14 @@ const BookAppointment = () => {
                           {service.duration} • €{service.price}
                         </p>
                       </div>
-                      {selectedService === service.id && (
+                      {state.selectedService === service.id && (
                         <CheckCircle className="text-rose-600 h-5 w-5" />
                       )}
                     </div>
                   ))}
                 </div>
                 <button
-                  disabled={!selectedService}
+                  disabled={!state.selectedService}
                   onClick={() => setStep(2)}
                   className="mt-8 w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                 >
@@ -196,70 +231,57 @@ const BookAppointment = () => {
               </motion.div>
             )}
 
+            {/* Step 2: Choose Date & Time */}
             {step === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Choose Date & Time</h3>
-                <div className="mb-8">
-                  {availableSlots.length === 0 ? (
-                    <div className="text-md text-slate-600 italic rounded-lg p-4 text-center">
-                      No time slots available. Please check again later.
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
-                        Select a Date
-                      </p>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {availableSlots.map(slot => (
-                          <button
-                            key={slot.date}
-                            onClick={() => {
-                              setSelectedDate(slot.date);
-                              setSelectedTime(null);
-                            }}
-                            className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
-                              selectedDate === slot.date
-                                ? 'border-rose-600 bg-rose-50 text-rose-600'
-                                : 'border-slate-100 hover:border-slate-200 text-slate-600'
-                            }`}
-                          >
-                            {formatDate(slot.date)}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                  {availableSlots.map(slot => (
+                    <button
+                      key={slot.date}
+                      onClick={() => dispatch({ type: 'SET_DATE', payload: slot.date })}
+                      className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
+                        state.selectedDate === slot.date
+                          ? 'border-rose-600 bg-rose-50 text-rose-600'
+                          : 'border-slate-100 hover:border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      {formatDate(slot.date)}
+                    </button>
+                  ))}
                 </div>
-                {/* Select Time */}
-                {selectedDate && selectedSlot && (
-                  <div className="mb-8">
-                    <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
-                      Available Time Slots
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {selectedSlot.times.map(slot => (
-                        <div key={slot.label} className="flex flex-col">
-                          <div
-                            onClick={() => setSelectedTime(slot)}
-                            className={`py-3 px-4 rounded-lg border-2 flex flex-col gap-1 text-sm  transition-all cursor-pointer ${
-                              selectedTime?.label === slot.label
-                                ? 'border-rose-600 bg-rose-50 text-rose-600'
-                                : 'border-slate-100 hover:border-slate-200 text-slate-600'
-                            }`}
-                          >
-                            <span className="font-bold"> {slot.label}</span>
-                            <span className="text-xs text-slate-400">
-                              Duration: {slot.duration} minutes
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+
+                {state.selectedDate && selectedSlotDay && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {selectedSlotDay.times.map(slot => (
+                      <div
+                        key={`${slot.startTime}-${slot.endTime}`}
+                        onClick={() =>
+                          dispatch({
+                            type: 'SET_SLOT',
+                            payload: {
+                              date: state.selectedDate,
+                              startTime: slot.startTime,
+                              endTime: slot.endTime,
+                            },
+                          })
+                        }
+                        className={`p-4 rounded-lg border cursor-pointer flex flex-col gap-1 ${
+                          state.selectedSlot?.startTime === slot.startTime
+                            ? 'border-rose-600 bg-rose-50'
+                            : 'border-slate-200'
+                        }`}
+                      >
+                        <span className="font-bold">
+                          {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                        </span>
+                        <span className="text-xs text-slate-400">{slot.duration} min</span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => setStep(1)}
                     className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
@@ -267,7 +289,7 @@ const BookAppointment = () => {
                     Back
                   </button>
                   <button
-                    disabled={!selectedDate || !selectedTime}
+                    disabled={!state.selectedSlot}
                     onClick={() => setStep(3)}
                     className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                   >
@@ -277,51 +299,40 @@ const BookAppointment = () => {
               </motion.div>
             )}
 
+            {/* Step 3: Client Details */}
             {step === 3 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Your Details</h3>
                 <div className="space-y-4 mb-8">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientDetails.name}
-                      onChange={e => setClientDetails({ ...clientDetails, name: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-                      placeholder="John Doe"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      value={clientDetails.email}
-                      onChange={e => setClientDetails({ ...clientDetails, email: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-                      placeholder="john@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      value={clientDetails.phone}
-                      onChange={e => setClientDetails({ ...clientDetails, phone: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-                      placeholder="(555) 123-4567"
-                      required
-                    />
-                  </div>
+                  {(['name', 'email', 'phone'] as ClientField[]).map(field => (
+                    <div key={field}>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {field === 'name'
+                          ? 'Full Name *'
+                          : field === 'email'
+                            ? 'Email Address *'
+                            : 'Phone Number *'}
+                      </label>
+                      <input
+                        type={field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
+                        value={state.clientDetails[field]}
+                        onChange={e =>
+                          dispatch({
+                            type: 'SET_CLIENT_DETAILS',
+                            payload: { field, value: e.target.value },
+                          })
+                        }
+                        className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                        placeholder={
+                          field === 'name'
+                            ? 'John Doe'
+                            : field === 'email'
+                              ? 'john@example.com'
+                              : '(555) 123-4567'
+                        }
+                      />
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex gap-4">
@@ -332,7 +343,11 @@ const BookAppointment = () => {
                     Back
                   </button>
                   <button
-                    disabled={!clientDetails.name || !clientDetails.email || !clientDetails.phone}
+                    disabled={
+                      !state.clientDetails.name ||
+                      !state.clientDetails.email ||
+                      !state.clientDetails.phone
+                    }
                     onClick={() => setStep(4)}
                     className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                   >
@@ -341,6 +356,8 @@ const BookAppointment = () => {
                 </div>
               </motion.div>
             )}
+
+            {/* Step 4: Confirmation */}
             {step === 4 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <div className="text-center py-8">
@@ -353,34 +370,28 @@ const BookAppointment = () => {
                   </p>
 
                   <div className="bg-slate-50 p-6 rounded-2xl text-left space-y-4 mb-8">
-                    <div className="flex justify-between border-b border-slate-200 pb-3">
-                      <span className="text-slate-500">Name</span>
-                      <span className="font-bold text-slate-900">{clientDetails.name}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-200 pb-3">
-                      <span className="text-slate-500">Email</span>
-                      <span className="font-bold text-slate-900">{clientDetails.email}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-200 pb-3">
-                      <span className="text-slate-500">Phone</span>
-                      <span className="font-bold text-slate-900">{clientDetails.phone}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-200 pb-3">
-                      <span className="text-slate-500">Service</span>
-                      <span className="font-bold text-slate-900">
-                        {SERVICES.find(s => s.id === selectedService)?.name}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-200 pb-3">
-                      <span className="text-slate-500">Date</span>
-                      <span className="font-bold text-slate-900">{formatDate(selectedDate)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">Time</span>
-                      <span className="font-bold text-slate-900">
-                        {selectedTime?.label} ({selectedTime?.duration} min)
-                      </span>
-                    </div>
+                    {[
+                      { label: 'Name', value: state.clientDetails.name },
+                      { label: 'Email', value: state.clientDetails.email },
+                      { label: 'Phone', value: state.clientDetails.phone },
+                      {
+                        label: 'Service',
+                        value: services?.find(s => s.id === state.selectedService)?.name,
+                      },
+                      { label: 'Date', value: formatDate(state.selectedDate) },
+                      {
+                        label: 'Time',
+                        value: `${formatTime(state.selectedSlot!.startTime)} – ${formatTime(state.selectedSlot!.endTime)}`,
+                      },
+                    ].map(item => (
+                      <div
+                        key={item.label}
+                        className="flex justify-between border-b border-slate-200 pb-3"
+                      >
+                        <span className="text-slate-500">{item.label}</span>
+                        <span className="font-bold text-slate-900">{item.value}</span>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="flex gap-4">
@@ -391,9 +402,11 @@ const BookAppointment = () => {
                       Back
                     </button>
                     <button
-                      onClick={() =>
-                        alert('Booking Successful! You will receive a confirmation email shortly.')
-                      }
+                      onClick={() => {
+                        alert('Booking Successful! You will receive a confirmation email shortly.');
+                        dispatch({ type: 'RESET' });
+                        setStep(1);
+                      }}
                       className="flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
                     >
                       Complete Booking

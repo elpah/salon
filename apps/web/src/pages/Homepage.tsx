@@ -87,6 +87,7 @@ const Homepage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {SERVICES.slice(0, 3).map((service, idx) => (
               <ServicesCard
+                key={idx}
                 id={service.id}
                 idx={idx}
                 image={service.image}
