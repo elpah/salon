@@ -3,14 +3,14 @@ import { randomUUID } from "crypto";
 
 const addNewService = async (service) => {
   try {
-    const newService = {
-      id: randomUUID(),
-      createdAt: new Date(),
-      ...service,
-    };
-
     const db = await connectToDatabase();
     const serviceCol = db.collection("services");
+
+    const newService = {
+      createdAt: new Date(),
+      ...service,
+      id: randomUUID(),
+    };
 
     const result = await serviceCol.insertOne(newService);
     if (!result.acknowledged) {
@@ -129,8 +129,6 @@ const restoreDeletedServiceById = async (id) => {
     return { success: false, message: err.message };
   }
 };
-
-
 
 export {
   addNewService,
