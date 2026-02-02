@@ -4,10 +4,10 @@ import { useContext, useState } from 'react';
 import AddServicesModal from '../components/AddServicesModal';
 import { GlobalContext } from '../context/GlobalContext';
 import { useServices } from '@salon/hooks';
-import { toast, ToastContainer } from 'react-toastify';
 import ShowModal from '../components/modal/ShowModal';
-import 'react-toastify/dist/ReactToastify.css';
+// import 'react-toastify/dist/ReactToastify.css';
 import useDeleteService from '../hooks/useDeleteService';
+import { notifyError,notifySuccess } from '../lib/utils';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -18,14 +18,6 @@ const ServicesPage = () => {
 
   const { data: services, isLoading, isError, refetch } = useServices(apiUrl);
   const { mutate: deleteProduct } = useDeleteService();
-
-  const notifySuccess = () => {
-    toast.success('Product Deleted Successfully.', {});
-  };
-  const notifyError = (message: string) => {
-    toast.error(message, {});
-  };
-
   const handleDeleteProduct = (id: string) => {
     setServiceIdToDelete(id);
     setShowModal(true);
@@ -36,7 +28,7 @@ const ServicesPage = () => {
     if (!serviceIdToDelete) return;
     deleteProduct(serviceIdToDelete!, {
       onSuccess: () => {
-        notifySuccess();
+        notifySuccess('Product Deleted Successfully');
         refetch();
       },
       onError: (error: any) => {
@@ -114,21 +106,9 @@ const ServicesPage = () => {
       <AnimatePresence>
         {globalContext.showAddServicesModal && <AddServicesModal />}
       </AnimatePresence>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={1500}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        theme="colored"
-        toastStyle={{
-          fontSize: '14px',
-        }}
-      />
     </div>
   );
 };
 
 export default ServicesPage;
+

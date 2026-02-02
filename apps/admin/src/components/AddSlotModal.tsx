@@ -191,9 +191,10 @@ const AddSlotModal = () => {
 
         <button
           onClick={handleAddSlot}
+          disabled={isPending}
           className="w-full mt-6 px-6 py-3 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all"
         >
-          Add Slot
+          {isPending ? 'Adding...' : 'Add Availability'}
         </button>
       </motion.div>
     </motion.div>

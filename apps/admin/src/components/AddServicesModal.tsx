@@ -2,36 +2,69 @@ import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
-import type { Service } from '../types/service.type';
+import type { Service } from '@salon/types';
+import { notifyError, notifySuccess } from '../lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+import useCreateNewService from '../hooks/useCreateNewService';
 
 const AddServicesModal = () => {
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useCreateNewService();
   const globalContext = useContext(GlobalContext);
-  const [newService, setNewService] = useState({
+  const [serviceToAdd, setServiceToAdd] = useState({
+    id: '',
     name: '',
     price: 0,
     duration: '',
     description: '',
     category: '',
+    image:
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aGFpcnxlbnwwfHwwfHx8MA%3D%3D',
   });
 
-  const handleAddService = () => {
-    if (newService.name && newService.price > 0) {
-      const service: Service = {
-        id: Date.now().toString(),
-        ...newService,
+  const handleCreateService = () => {
+    if (
+      serviceToAdd.name &&
+      serviceToAdd.price &&
+      serviceToAdd.duration &&
+      serviceToAdd.category &&
+      serviceToAdd.description
+    ) {
+      const newService: Service = {
+        id: '',
+        name: serviceToAdd.name,
+        price: serviceToAdd.price,
+        duration: serviceToAdd.duration,
+        category: serviceToAdd.category,
+        description: serviceToAdd.description,
+        image: serviceToAdd.image,
       };
-      globalContext.setServices([...globalContext.services, service]);
-      setNewService({
-        name: '',
-        price: 0,
-        duration: '',
-        description: '',
-        category: '',
+
+      mutate(newService, {
+        onSuccess: () => {
+          notifySuccess('Service Successfully Added');
+          queryClient.invalidateQueries({ queryKey: ['services'] });
+          setServiceToAdd({
+            id: '',
+            name: '',
+            price: 0,
+            duration: '',
+            description: '',
+            category: '',
+            image:
+              'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aGFpcnxlbnwwfHwwfHx8MA%3D%3D',
+          });
+          globalContext.setshowAddServicesModal(false);
+        },
+        onError: (err: any) => {
+          notifyError('Something went wrong while submitting.');
+          if (import.meta.env.VITE_NODE_ENV !== 'production') {
+            console.error(err);
+          }
+        },
       });
-      globalContext.setshowAddServicesModal(false);
     }
   };
-
   return (
     <motion.div
       initial={{
@@ -77,10 +110,10 @@ const AddServicesModal = () => {
             <label className="block text-sm font-semibold text-slate-700 mb-2">Service Name</label>
             <input
               type="text"
-              value={newService.name}
+              value={serviceToAdd.name}
               onChange={e =>
-                setNewService({
-                  ...newService,
+                setServiceToAdd({
+                  ...serviceToAdd,
                   name: e.target.value,
                 })
               }
@@ -93,10 +126,10 @@ const AddServicesModal = () => {
             <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
             <input
               type="text"
-              value={newService.category}
+              value={serviceToAdd.category}
               onChange={e =>
-                setNewService({
-                  ...newService,
+                setServiceToAdd({
+                  ...serviceToAdd,
                   category: e.target.value,
                 })
               }
@@ -109,10 +142,10 @@ const AddServicesModal = () => {
             <label className="block text-sm font-semibold text-slate-700 mb-2">Price ($)</label>
             <input
               type="number"
-              value={newService.price}
+              value={serviceToAdd.price}
               onChange={e =>
-                setNewService({
-                  ...newService,
+                setServiceToAdd({
+                  ...serviceToAdd,
                   price: parseFloat(e.target.value),
                 })
               }
@@ -125,10 +158,10 @@ const AddServicesModal = () => {
             <label className="block text-sm font-semibold text-slate-700 mb-2">Duration</label>
             <input
               type="text"
-              value={newService.duration}
+              value={serviceToAdd.duration}
               onChange={e =>
-                setNewService({
-                  ...newService,
+                setServiceToAdd({
+                  ...serviceToAdd,
                   duration: e.target.value,
                 })
               }
@@ -140,10 +173,10 @@ const AddServicesModal = () => {
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Description</label>
             <textarea
-              value={newService.description}
+              value={serviceToAdd.description}
               onChange={e =>
-                setNewService({
-                  ...newService,
+                setServiceToAdd({
+                  ...serviceToAdd,
                   description: e.target.value,
                 })
               }
@@ -155,10 +188,11 @@ const AddServicesModal = () => {
         </div>
 
         <button
-          onClick={handleAddService}
+          onClick={handleCreateService}
+          disabled={isPending}
           className="w-full mt-6 px-6 py-3 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all"
         >
-          Add Service
+          {isPending ? 'Adding...' : 'Add Service'}
         </button>
       </motion.div>
     </motion.div>
