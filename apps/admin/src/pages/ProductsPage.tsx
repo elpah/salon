@@ -7,7 +7,7 @@ import { useProducts } from '@salon/hooks';
 import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
 import ShowModal from '../components/modal/ShowModal';
-import { notifyError, notifySuccess  } from '@salon/ui';
+import { notifyError, notifySuccess } from '@salon/ui';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {

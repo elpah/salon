@@ -4,7 +4,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import type { Product } from '@salon/types';
 import { ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 
 function App() {

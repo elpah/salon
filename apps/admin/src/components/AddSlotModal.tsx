@@ -5,8 +5,7 @@ import { GlobalContext } from '../context/GlobalContext';
 import type { AvailabilityWindow } from '@salon/types';
 import useCreateAvailability from '../hooks/useCreateNewAvailability';
 import { useQueryClient } from '@tanstack/react-query';
-import { notifyError, notifySuccess  } from '@salon/ui';
-
+import { notifyError, notifySuccess } from '@salon/ui';
 
 const AddSlotModal = () => {
   const globalContext = useContext(GlobalContext);

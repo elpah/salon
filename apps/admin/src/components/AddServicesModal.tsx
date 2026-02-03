@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
 import type { Service } from '@salon/types';
-import { notifyError, notifySuccess  } from '@salon/ui';
+import { notifyError, notifySuccess } from '@salon/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import useCreateNewService from '../hooks/useCreateNewService';
 
