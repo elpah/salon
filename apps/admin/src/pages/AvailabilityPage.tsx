@@ -7,7 +7,7 @@ import useGetAvailability from '../hooks/useGetAvailability';
 import useDeleteAvailability from '../hooks/useDeleteAvailability';
 import ShowModal from '../components/modal/ShowModal';
 import type { AvailabilityWindow } from '@salon/types';
-import { notifyError, notifySuccess } from '../lib/utils';
+import { notifyError, notifySuccess  } from '@salon/ui';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -30,7 +30,7 @@ const AvailabilityPage = () => {
         notifySuccess('Product Deleted Successfully.');
         refetch();
       },
-      onError: (error: unknown) => {
+      onError: () => {
         notifyError('Error Deleting product');
       },
     });

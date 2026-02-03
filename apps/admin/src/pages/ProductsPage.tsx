@@ -6,9 +6,8 @@ import AddProductModal from '../components/AddProductModal';
 import { useProducts } from '@salon/hooks';
 import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
-import 'react-toastify/dist/ReactToastify.css';
 import ShowModal from '../components/modal/ShowModal';
-import { notifySuccess, notifyError } from '../lib/utils';
+import { notifyError, notifySuccess  } from '@salon/ui';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {

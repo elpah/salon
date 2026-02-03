@@ -5,9 +5,8 @@ import AddServicesModal from '../components/AddServicesModal';
 import { GlobalContext } from '../context/GlobalContext';
 import { useServices } from '@salon/hooks';
 import ShowModal from '../components/modal/ShowModal';
-// import 'react-toastify/dist/ReactToastify.css';
 import useDeleteService from '../hooks/useDeleteService';
-import { notifyError, notifySuccess } from '../lib/utils';
+import { notifyError, notifySuccess  } from '@salon/ui';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
