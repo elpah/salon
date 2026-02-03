@@ -1,41 +1,22 @@
+import useCreateNewBooking from '@/hooks/useCreateNewBooking';
 import useGetAvailabilities from '@/hooks/useGetAvailabilities';
 import { useServices, useGetBookedSlots } from '@salon/hooks';
-import { AvailabilityWindow, BookedSlot } from '@salon/types';
+import {
+  AvailabilityWindow,
+  BookedSlot,
+  BookingType,
+  AvailableTime,
+  SelectedSlot,
+  AvailableSlotByDate,
+} from '@salon/types';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useReducer, useState } from 'react';
+import { notifyError, notifySuccess } from '@salon/ui';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-type SelectedSlot = {
-  date: string;
-  startTime: string;
-  endTime: string;
-};
-
-interface AvailableTime {
-  startTime: string;
-  endTime: string;
-  duration: number;
-}
-
-interface AvailableSlotByDate {
-  date: string;
-  times: AvailableTime[];
-}
-
-type BookingState = {
-  selectedService: string | null;
-  selectedDate: string;
-  selectedSlot: SelectedSlot | null;
-  clientDetails: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-};
-
-type ClientField = keyof BookingState['clientDetails'];
+type ClientField = keyof BookingType['clientDetails'];
 
 type BookingAction =
   | { type: 'SET_SERVICE'; payload: string | null }
@@ -44,14 +25,14 @@ type BookingAction =
   | { type: 'SET_CLIENT_DETAILS'; payload: { field: ClientField; value: string } }
   | { type: 'RESET' };
 
-const initialBookingState: BookingState = {
+const initialBookingState: BookingType = {
   selectedService: null,
   selectedDate: '',
   selectedSlot: null,
   clientDetails: { name: '', email: '', phone: '' },
 };
 
-function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+function bookingReducer(state: BookingType, action: BookingAction): BookingType {
   switch (action.type) {
     case 'SET_SERVICE':
       return { ...state, selectedService: action.payload };
@@ -74,6 +55,7 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
   const [state, dispatch] = useReducer(bookingReducer, initialBookingState);
+  const { mutate, isPending } = useCreateNewBooking();
 
   const { data: services, isLoading, isError } = useServices(apiUrl);
   const { data: availabilityWindow, isLoading: availabilityIsLoading } =
@@ -162,6 +144,27 @@ const BookAppointment = () => {
       year: 'numeric',
     });
 
+  const createNewBooking = () => {
+    if (state.clientDetails && state.selectedDate && state.selectedService && state.selectedSlot) {
+      const newBooking: BookingType = {
+        id: '',
+        ...state,
+      };
+
+      mutate(newBooking, {
+        onSuccess: () => {
+          notifySuccess('Availability Successfully Added');
+          dispatch({ type: 'RESET' });
+        },
+        onError: err => {
+          notifyError('Something went wrong while submitting.');
+          if (import.meta.env.VITE_NODE_ENV !== 'production') {
+            console.error(err);
+          }
+        },
+      });
+    }
+  };
   return (
     <div className="pt-24 pb-24 bg-slate-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -381,7 +384,9 @@ const BookAppointment = () => {
                       { label: 'Date', value: formatDate(state.selectedDate) },
                       {
                         label: 'Time',
-                        value: `${formatTime(state.selectedSlot!.startTime)} – ${formatTime(state.selectedSlot!.endTime)}`,
+                        value: state.selectedSlot
+                          ? `${formatTime(state.selectedSlot.startTime)} – ${formatTime(state.selectedSlot.endTime)}`
+                          : '—',
                       },
                     ].map(item => (
                       <div
@@ -403,9 +408,10 @@ const BookAppointment = () => {
                     </button>
                     <button
                       onClick={() => {
+                        createNewBooking();
+                        console.log(state);
                         alert('Booking Successful! You will receive a confirmation email shortly.');
-                        dispatch({ type: 'RESET' });
-                        setStep(1);
+                        // setStep(1);
                       }}
                       className="flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
                     >
