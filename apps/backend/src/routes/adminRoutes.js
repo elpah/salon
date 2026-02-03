@@ -22,6 +22,8 @@ import {
   getBookedSlots,
 } from "../services/admin-services/availability.services.js";
 
+import { createNewBooking } from "../services/admin-services/bookings.services.js";
+
 const adminRoute = Router();
 
 adminRoute.get("/", async (_req, res) => {
@@ -188,9 +190,7 @@ adminRoute.post("/restore-service/:id", async (req, res) => {
 
 adminRoute.post("/create-new-availability", async (req, res) => {
   try {
-    // console.log("Received data:", req.body);
     const insertedId = await createAvailabilityWindow(req.body);
-    console.log();
     return res.status(201).json({
       message: "Availability window created successfully",
       id: insertedId,
@@ -204,9 +204,25 @@ adminRoute.post("/create-new-availability", async (req, res) => {
   }
 });
 
+adminRoute.post("/create-new-booking", async (req, res) => {
+  try {
+    const result = await createNewBooking(req.body);
+    return res.status(201).json({
+      message: "Booking created successfully",
+      bookingId: result.bookingId,
+      bookedSlotId: result.bookedSlotId,
+    });
+  } catch (err) {
+    console.error("Error in /create-new-booking:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+
 adminRoute.post("/create-new-service", async (req, res) => {
   try {
-    // console.log("Received data:", req.body);
     const insertedId = await addNewService(req.body);
     console.log();
     return res.status(201).json({
