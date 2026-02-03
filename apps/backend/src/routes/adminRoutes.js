@@ -22,7 +22,10 @@ import {
   getBookedSlots,
 } from "../services/admin-services/availability.services.js";
 
-import { createNewBooking } from "../services/admin-services/bookings.services.js";
+import {
+  createNewBooking,
+  getAllBookings,
+} from "../services/admin-services/bookings.services.js";
 
 const adminRoute = Router();
 
@@ -246,6 +249,16 @@ adminRoute.get("/availabilities", async (_req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+adminRoute.get("/bookings", async (_req, res) => {
+  try {
+    const bookings = await getAllBookings();
+    res.status(200).json(bookings);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 adminRoute.delete("/delete-availability/:id", async (req, res) => {
   const { id } = req.params;
