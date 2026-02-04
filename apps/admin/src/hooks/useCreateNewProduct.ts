@@ -13,7 +13,7 @@ const useCreateNewProduct = () => {
 
       const formData = new FormData();
       formData.append('productData', JSON.stringify(productData));
-      formData.append('productImage', productData.image);
+      // formData.append('productImage', productData.image);
 
       try {
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/add-product`, formData, {
