@@ -1,13 +1,13 @@
 import { connectToDatabase } from "../../config/db.js";
 import { randomUUID } from "crypto";
+import { deleteCloudinaryImage } from "./cloudinary.services.js";
 
-// product: name, category, price, stock quantity, image, description
 const addNewProduct = async (product) => {
   try {
     const newProduct = {
+      ...product,
       id: randomUUID(),
       createdAt: new Date(),
-      ...product,
     };
 
     const db = await connectToDatabase();
@@ -15,13 +15,13 @@ const addNewProduct = async (product) => {
 
     const result = await productCollection.insertOne(newProduct);
     if (!result.acknowledged) {
-      throw new Error("Failed to insert new car");
+      throw new Error("Failed to insert new product");
     }
 
-    return newProduct.productId;
+    return true;
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
-      console.error("Error in addNewCar:", err.message);
+      console.error("Error in addNewProduct:", err.message);
     }
     return null;
   }
@@ -114,6 +114,16 @@ const permanentlyDeleteProductById = async (id) => {
   try {
     const db = await connectToDatabase();
     const deletedCol = db.collection("deleted-products");
+
+    const product = await deletedCol.findOne({ id });
+    if (!product) {
+      return {
+        success: false,
+        message: "Service not found or already deleted",
+      };
+    }
+    await deleteCloudinaryImage(product.public_id);
+
     const result = await deletedCol.deleteOne({ id });
     if (result.deletedCount === 0) {
       return { success: false, message: "Product not found" };

@@ -1,5 +1,9 @@
 import { Router } from "express";
+import multer from "multer";
+import { uploadImage } from "../services/admin-services/cloudinary.services.js";
+
 import {
+  addNewProduct,
   getAllProducts,
   getProductById,
   deleteProductById,
@@ -28,6 +32,8 @@ import {
 } from "../services/admin-services/bookings.services.js";
 
 const adminRoute = Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage }).single("image");
 
 adminRoute.get("/", async (_req, res) => {
   res.status(200).json({ message: "arrived" });
@@ -224,23 +230,6 @@ adminRoute.post("/create-new-booking", async (req, res) => {
   }
 });
 
-adminRoute.post("/create-new-service", async (req, res) => {
-  try {
-    const insertedId = await addNewService(req.body);
-    console.log();
-    return res.status(201).json({
-      message: "Service created successfully",
-      id: insertedId,
-    });
-  } catch (err) {
-    console.error("Error in /create-new-service:", err.message);
-
-    return res.status(400).json({
-      error: err.message || "Something went wrong",
-    });
-  }
-});
-
 adminRoute.get("/availabilities", async (_req, res) => {
   try {
     const availabilities = await getAllAvailabilities();
@@ -258,7 +247,6 @@ adminRoute.get("/bookings", async (_req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 adminRoute.delete("/delete-availability/:id", async (req, res) => {
   const { id } = req.params;
@@ -286,4 +274,63 @@ adminRoute.get("/booked-slots", async (_req, res) => {
   }
 });
 
+adminRoute.post("/create-new-service", upload, async (req, res) => {
+  try {
+    let newService = JSON.parse(req.body.newService);
+    const serviceImage = req.file;
+
+    if (serviceImage) {
+      const uploaded = await uploadImage(
+        serviceImage,
+        "professional_hair_stylist/service_images",
+      );
+      if (!uploaded || !uploaded.url) {
+        throw new Error("Image upload failed or did not return a URL");
+      }
+      newService.image = uploaded.url;
+      newService.public_id = uploaded.public_id;
+    }
+    const insertedId = await addNewService(newService);
+    console.log();
+    return res.status(201).json({
+      message: "Service created successfully",
+      id: insertedId,
+    });
+  } catch (err) {
+    console.error("Error in /create-new-service:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+
+adminRoute.post("/add-product", upload, async (req, res) => {
+  try {
+    let productData = JSON.parse(req.body.productData);
+    const productImage = req.file;
+
+    if (productImage) {
+      const uploaded = await uploadImage(
+        productImage,
+        "professional_hair_stylist/product_images",
+      );
+      if (!uploaded || !uploaded.url) {
+        throw new Error("Image upload failed or did not return a URL");
+      }
+      productData.image = uploaded.url;
+      productData.public_id = uploaded.public_id;
+    }
+    const result = await addNewProduct(productData);
+    if (!result) {
+      return res.status(500).json({ message: "Failed to add product" });
+    }
+    res.status(200).json({ message: "Product added successfully" });
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(error);
+    }
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
 export default adminRoute;

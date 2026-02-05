@@ -1,6 +1,6 @@
 import { connectToDatabase } from "../../config/db.js";
 import { randomUUID } from "crypto";
-
+import { deleteCloudinaryImage } from "./cloudinary.services.js";
 const addNewService = async (service) => {
   try {
     const db = await connectToDatabase();
@@ -20,7 +20,7 @@ const addNewService = async (service) => {
     return newService.id;
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
-      console.error("Error in addNewCar:", err.message);
+      console.error("Error in addNewService:", err.message);
     }
     return null;
   }
@@ -95,6 +95,15 @@ const permanentlyDeleteServiceById = async (id) => {
   try {
     const db = await connectToDatabase();
     const deletedCol = db.collection("deleted-services");
+
+    const service = await deletedCol.findOne({ id });
+    if (!service) {
+      return {
+        success: false,
+        message: "Service not found or already deleted",
+      };
+    }
+    await deleteCloudinaryImage(service.public_id);
     const result = await deletedCol.deleteOne({ id });
     if (result.deletedCount === 0) {
       return { success: false, message: "Service not found" };
