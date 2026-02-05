@@ -26,11 +26,10 @@ const Sidebar = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // Listen to window resize
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -44,12 +43,14 @@ const Sidebar = ({
 
   return (
     <>
-      {/* {isOpen && isMobile && <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />} */}
       <motion.div
         initial={{ x: -280 }}
         animate={{ x: isOpen || !isMobile ? 0 : -280 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className=" fixed buttom-0 top-0 left-0 bottom-0 md:static md:top-auto md:bottom-auto md:left-aut md:min-h-screen w-60 bg-slate-900 text-white flex flex-col z-50"
+        className={`
+    fixed top-0 left-0 h-full w-60  lg:w-80 bg-slate-900 text-white flex flex-col z-50
+    lg:sticky md:top-0 md:min-h-screen
+  `}
       >
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <div>

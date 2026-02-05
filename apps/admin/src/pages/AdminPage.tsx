@@ -94,7 +94,7 @@ export const AdminDashboard = () => {
     }
   };
   return (
-    <div className=" md:flex min-h-screen bg-slate-50">
+    <div className=" lg:flex min-h-screen bg-slate-50">
       <Sidebar
         currentPage={currentPage}
         setPage={setCurrentPage}
@@ -103,10 +103,10 @@ export const AdminDashboard = () => {
         onClose={() => setIsSidebarOpen(false)}
       />
       <main className="p-3 grow">
-        <div className="md:hidden z-30 bg-white border-b border-slate-200  py-4 flex items-center justify-between">
+        <div className="lg:hidden z-30 bg-white border-b border-slate-200  py-4 flex items-center justify-between">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className=" text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+            className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
           >
             <Menu className="h-6 w-6" />
           </button>
@@ -140,7 +140,7 @@ export const AdminDashboard = () => {
               {pageConfig[currentPage]?.showButton && (
                 <button
                   onClick={pageConfig[currentPage]?.action}
-                  className="flex items-center px-6 py-3 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 transition-all"
+                  className="cursor-pointer flex items-center px-6 py-3 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 transition-all"
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   {pageConfig[currentPage]?.label}

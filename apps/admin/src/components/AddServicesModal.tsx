@@ -1,26 +1,43 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
 import type { Service } from '@salon/types';
 import { notifyError, notifySuccess } from '@salon/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import useCreateNewService from '../hooks/useCreateNewService';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 const AddServicesModal = () => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateNewService();
   const globalContext = useContext(GlobalContext);
-  const [serviceToAdd, setServiceToAdd] = useState({
+
+  const {
+    data: serviceToAdd,
+    setData: setServiceToAdd,
+    imagePreview,
+    dragging,
+    handleFileChange: handleImageUpload,
+    handleDrop,
+    handleDragEnter,
+    handleDragLeave,
+    clearImage,
+  } = useImageUpload<Service>({
     id: '',
     name: '',
     price: 0,
     duration: '',
     description: '',
     category: '',
-    image:
-      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aGFpcnxlbnwwfHwwfHx8MA%3D%3D',
+    image: null,
   });
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const handleCreateService = () => {
     if (
@@ -28,7 +45,8 @@ const AddServicesModal = () => {
       serviceToAdd.price &&
       serviceToAdd.duration &&
       serviceToAdd.category &&
-      serviceToAdd.description
+      serviceToAdd.description &&
+      serviceToAdd.image
     ) {
       const newService: Service = {
         id: '',
@@ -51,8 +69,7 @@ const AddServicesModal = () => {
             duration: '',
             description: '',
             category: '',
-            image:
-              'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aGFpcnxlbnwwfHwwfHx8MA%3D%3D',
+            image: null,
           });
           globalContext.setshowAddServicesModal(false);
         },
@@ -169,7 +186,74 @@ const AddServicesModal = () => {
               placeholder="e.g., 60 min, 2 hrs"
             />
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Service Image</label>
 
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative inline-block mb-3">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="h-30 w-auto object-cover rounded-lg border-2 border-slate-200"
+                />
+                <button
+                  onClick={clearImage}
+                  className="absolute -top-2 -right-2 flex items-center justify-center
+                    h-8 w-8 rounded-full bg-red-600 text-white shadow-lg
+                      hover:bg-red-700 transition"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
+            <div
+              className={`relative transition-all rounded-lg border-2 border-dashed 
+                ${
+                  dragging
+                    ? 'border-rose-600 bg-rose-50 ring-2 ring-rose-400/40 scale-[1.01]'
+                    : 'border-slate-300 hover:border-rose-600 hover:bg-rose-50'
+                }`}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={e => e.preventDefault()}
+              onDrop={handleDrop}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="product-image-upload"
+              />
+
+              <label
+                htmlFor="product-image-upload"
+                className="flex items-center justify-center w-full px-4 py-6 cursor-pointer"
+              >
+                <div className="text-center pointer-events-none">
+                  <Upload
+                    className={`h-8 w-8 mx-auto mb-2 transition-colors ${
+                      dragging ? 'text-rose-600' : 'text-slate-400'
+                    }`}
+                  />
+
+                  <p className="text-sm font-medium">
+                    {dragging ? (
+                      <span className="text-rose-600 font-semibold">Drop image here</span>
+                    ) : imagePreview ? (
+                      'Change Image'
+                    ) : (
+                      'Upload Image or Drag & Drop'
+                    )}
+                  </p>
+
+                  <p className="text-xs text-slate-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                </div>
+              </label>
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Description</label>
             <textarea

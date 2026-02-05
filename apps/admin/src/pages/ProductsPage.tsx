@@ -60,24 +60,33 @@ const ProductsPage = () => {
           products.map((product: Product) => (
             <div
               key={product.id}
-              className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all"
+              className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
-                  <p className="text-sm text-slate-500">{product.category}</p>
-                </div>
-                <button
-                  onClick={() => handleDeleteProduct(product.id)}
-                  className="cursor-pointer text-red-600 hover:text-red-700 p-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+              <div className="w-full  h-60 bg-slate-100 overflow-hidden rounded-t-xl flex items-center justify-center">
+                <img
+                  src={product.image as string}
+                  alt={product.name}
+                  className="max-h-60 w-full object-contain"
+                />
               </div>
-              <p className="text-sm text-slate-600 mb-4">{product.description}</p>
-              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <p className="text-xl font-bold text-rose-600">€{product.price}</p>
-                <p className="text-sm text-slate-500">Stock: {product.stock}</p>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
+                    <p className="text-sm text-slate-500">{product.category}</p>
+                  </div>
+                  <button
+                    onClick={() => product.id && handleDeleteProduct(product.id)}
+                    className="text-red-600 hover:text-red-700 p-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-sm text-slate-600 mb-4">{product.description}</p>
+                <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                  <p className="text-xl font-bold text-rose-600">${product.price}</p>
+                  <p className="text-sm text-slate-500">Stock: {product.stock}</p>
+                </div>
               </div>
             </div>
           ))

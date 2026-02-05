@@ -9,12 +9,18 @@ const useCreateNewService = () => {
       //   if (!user) throw new Error("User not logged in");
 
       //   const token = await user.getIdToken();
+      const formData = new FormData();
+      formData.append('newService', JSON.stringify(newService));
+      if (newService.image) {
+        formData.append('image', newService.image);
+      }
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/create-new-service`,
-          newService,
+          formData,
           {
             headers: {
+              'Content-Type': 'multipart/form-data',
               //   Authorization: `Bearer ${token}`,
             },
           }

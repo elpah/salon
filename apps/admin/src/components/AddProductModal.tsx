@@ -1,107 +1,73 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GlobalContext } from '../context/GlobalContext';
 import type { Product } from '@salon/types';
 import { Upload, X } from 'lucide-react';
+import useCreateNewProduct from '../hooks/useCreateNewProduct';
+import { notifyError, notifySuccess } from '@salon/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 const AddProductModal = () => {
   const globalContext = useContext(GlobalContext);
-  const [imagePreview, setImagePreview] = useState<string>('');
-  const [dragging, setDragging] = useState(false);
-
-  const [newProduct, setNewProduct] = useState<Product>({
+  const queryClient = useQueryClient();
+  const {
+    data: newProduct,
+    setData: setNewProduct,
+    imagePreview,
+    dragging,
+    handleFileChange: handleImageUpload,
+    handleDrop,
+    handleDragEnter,
+    handleDragLeave,
+    clearImage,
+  } = useImageUpload<Product>({
     name: '',
     price: 0,
     category: '',
     description: '',
     stock: 0,
-    image: '',
+    image: null,
   });
 
+  const { mutate, isPending } = useCreateNewProduct();
+
   useEffect(() => {
-    console.log(newProduct);
-  }, [newProduct]);
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB');
-        return;
-      }
-
-      // Create preview and store base64
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImagePreview(base64String);
-        setNewProduct({
-          ...newProduct,
-          image: base64String,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please drop an image file');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setImagePreview(base64String);
-      setNewProduct({
-        ...newProduct,
-        image: base64String,
-      });
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
     };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(false);
-  };
+  }, [imagePreview]);
 
   const handleAddProduct = () => {
-    if (newProduct.name && newProduct.price > 0) {
-      const product: Product = {
-        id: Date.now().toString(),
-        ...newProduct,
-      };
-      globalContext.setProducts([...globalContext.products, product]);
-      setNewProduct({
-        name: '',
-        price: 0,
-        category: '',
-        description: '',
-        stock: 0,
-        image: '',
+    if (
+      newProduct.name &&
+      newProduct.price &&
+      newProduct.stock &&
+      newProduct.category &&
+      newProduct.description &&
+      newProduct.image
+    ) {
+      mutate(newProduct, {
+        onSuccess: () => {
+          notifySuccess('Product Successfully Added');
+          queryClient.invalidateQueries({ queryKey: ['products'] });
+          setNewProduct({
+            name: '',
+            price: 0,
+            category: '',
+            description: '',
+            stock: 0,
+            image: '',
+          });
+          globalContext.setShowAddProductModal(false);
+        },
+        onError: (err: unknown) => {
+          notifyError('Unable to upload new product. Try again later');
+          if (import.meta.env.VITE_NODE_ENV !== 'production') {
+            console.error(err);
+          }
+        },
       });
-      globalContext.setShowAddProductModal(false);
     }
   };
   return (
@@ -138,7 +104,7 @@ const AddProductModal = () => {
           <h3 className="text-2xl font-bold text-slate-900">Add Product</h3>
           <button
             onClick={() => globalContext.setShowAddProductModal(false)}
-            className="text-slate-400 hover:text-slate-600"
+            className=" cursor-pointer text-slate-400 hover:text-slate-600"
           >
             <X className="h-6 w-6" />
           </button>
@@ -178,7 +144,7 @@ const AddProductModal = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Price ($)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Price (€)</label>
             <input
               type="number"
               value={newProduct.price}
@@ -222,30 +188,24 @@ const AddProductModal = () => {
                   alt="Preview"
                   className="h-30 w-auto object-cover rounded-lg border-2 border-slate-200"
                 />
-
                 <button
-                  onClick={() => {
-                    setImagePreview('');
-                    setNewProduct({
-                      ...newProduct,
-                      image: '',
-                    });
-                  }}
+                  onClick={clearImage}
                   className="absolute -top-2 -right-2 flex items-center justify-center
-                 h-8 w-8 rounded-full bg-red-600 text-white shadow-lg
-                 hover:bg-red-700 transition"
+                    h-8 w-8 rounded-full bg-red-600 text-white shadow-lg
+                      hover:bg-red-700 transition"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
             )}
+
             <div
               className={`relative transition-all rounded-lg border-2 border-dashed 
-            ${
-              dragging
-                ? 'border-rose-600 bg-rose-50 ring-2 ring-rose-400/40 scale-[1.01]'
-                : 'border-slate-300 hover:border-rose-600 hover:bg-rose-50'
-            }`}
+                ${
+                  dragging
+                    ? 'border-rose-600 bg-rose-50 ring-2 ring-rose-400/40 scale-[1.01]'
+                    : 'border-slate-300 hover:border-rose-600 hover:bg-rose-50'
+                }`}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDragOver={e => e.preventDefault()}
@@ -305,9 +265,10 @@ const AddProductModal = () => {
 
         <button
           onClick={handleAddProduct}
+          disabled={isPending}
           className="w-full mt-6 px-6 py-3 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all"
         >
-          Add Product
+          {isPending ? 'Adding...' : 'Add Product'}
         </button>
       </motion.div>
     </motion.div>
