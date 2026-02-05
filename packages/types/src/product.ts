@@ -1,12 +1,12 @@
 import type { QueryObserverResult } from "@tanstack/react-query";
 
 export interface Product {
-  id: string;
+  id?: string;
   name: string;
   price: number;
   stock:number;
   category: "wigs" | "equipment" | "care" | string;
-  image: string;
+  image:File| string | null;
   description: string;
 }
 

@@ -7,7 +7,9 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspaces",
-    "build": "npm run build --workspaces"
+    "build": "npm run build --workspaces",
+    "format": "cd apps/admin && npm run format && cd ../../apps/web && npm run format",
+    "lint": "cd apps/admin && npm run lint && cd ../../apps/web && npm run lint"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",

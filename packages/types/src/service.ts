@@ -10,9 +10,9 @@ export interface UseServiceResult {
 export interface Service {
   id: string;
   name: string;
+  image: File | string | null;
   price: number;
   category: string;
   duration: string;
-  image: string;
   description: string;
 }

@@ -59,7 +59,7 @@ const BookingsPage = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
-          {bookings?.map((booking:BookingType) => (
+          {bookings?.map((booking: BookingType) => (
             <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
               <td
                 className=" sticky left-0 z-10 shadow-[inset_-1px_0_0_0_rgb(226,232,240)]
