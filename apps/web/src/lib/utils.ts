@@ -28,4 +28,5 @@ export const NAV_LINKS = [
   { name: 'Shop', path: '/shop' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' },
+  // { name: 'Checkout', path: '/checkout' },
 ];

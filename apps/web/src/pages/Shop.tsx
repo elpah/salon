@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 import { useProducts } from '@salon/hooks';
+import { Product } from '@salon/types';
+import { GlobalContext } from '@/context/GlobalContext';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Shop = () => {
+  const globalContext = useContext(GlobalContext);
   const [activeCategory, setActiveCategory] = useState<'all' | 'wigs' | 'equipment' | 'care'>(
     'all'
   );
+
+  function addToCart(cart: Product[], product: Product): Product[] {
+    const existingItem = cart.find(item => item.id === product.id);
+
+    if (existingItem) {
+      return cart.map(item =>
+        item.id === product.id ? { ...item, quantity: (item.quantity ?? 0) + 1 } : item
+      );
+    }
+
+    return [...cart, { ...product, quantity: 1 }];
+  }
 
   const { data: products, isLoading, isError } = useProducts(apiUrl);
 
@@ -58,11 +73,16 @@ const Shop = () => {
             <motion.div layout key={product.id} className="bg-white group">
               <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-50 mb-6">
                 <img
-                  src={product.image}
+                  src={product.image as string}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <button className="absolute bottom-4 right-4 p-3 bg-white text-slate-900 rounded-full shadow-lg transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                <button
+                  onClick={() => {
+                    globalContext.setCart(prev => addToCart(prev, product));
+                  }}
+                  className=" cursor-pointer absolute bottom-4 right-4 p-3 bg-white text-slate-900 rounded-full shadow-lg transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
+                >
                   <ShoppingCart className="h-5 w-5" />
                 </button>
                 {product.category === 'wigs' && (
@@ -80,7 +100,12 @@ const Shop = () => {
                 <span className="text-xl font-bold text-slate-900">€{product.price}</span>
               </div>
               <p className="text-sm text-slate-500 mb-4">{product.description}</p>
-              <button className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-rose-600 transition-all">
+              <button
+                onClick={() => {
+                  globalContext.setCart(prev => addToCart(prev, product));
+                }}
+                className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-rose-600 transition-all"
+              >
                 Add to Cart
               </button>
             </motion.div>

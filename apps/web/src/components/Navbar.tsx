@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Scissors, X, Menu } from 'lucide-react';
+import { Scissors, X, Menu, ShoppingCart } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/utils';
+import { GlobalContext } from '@/context/GlobalContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const globalContext = useContext(GlobalContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,7 +69,27 @@ const Navbar = () => {
                 {link.name}
               </button>
             ))}
-
+            <button
+              onClick={() => handleNavClick('cart')}
+              className={`relative p-2 cursor-pointer ${
+                location.pathname === 'cart'
+                  ? isScrolled
+                    ? 'text-rose-600'
+                    : 'text-rose-400'
+                  : location.pathname === '/'
+                    ? isScrolled
+                      ? 'text-slate-600 hover:text-rose-600'
+                      : 'text-slate-100 hover:text-white'
+                    : 'text-slate-600 hover:text-rose-600'
+              }`}
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {globalContext.cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {globalContext.cartCount}
+                </span>
+              )}
+            </button>
             <button
               onClick={() => handleNavClick('/book-appointment')}
               className={`cursor-pointer px-6 py-2 rounded-full font-medium transition-all ${
