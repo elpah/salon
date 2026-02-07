@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, X } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
@@ -7,12 +7,19 @@ import { notifyError, notifySuccess } from '@salon/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import useCreateNewService from '../hooks/useCreateNewService';
 import { useImageUpload } from '../hooks/useImageUpload';
+import { useGetCategories } from '@salon/hooks';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AddServicesModal = () => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateNewService();
+  const [error, setError] = useState<boolean>(false);
   const globalContext = useContext(GlobalContext);
-
+  const {
+    data: categories,
+    isLoading: categoriesIsLoading,
+    isError: categoriesIsError,
+  } = useGetCategories(apiUrl);
   const {
     data: serviceToAdd,
     setData: setServiceToAdd,
@@ -38,15 +45,29 @@ const AddServicesModal = () => {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
     };
   }, [imagePreview]);
+  if (categoriesIsLoading) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-slate-500">Loading Categories...</p>
+      </div>
+    );
+  }
+  if (categoriesIsError) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load Categories. Please try again.</p>
+      </div>
+    );
+  }
 
   const handleCreateService = () => {
     if (
-      serviceToAdd.name &&
-      serviceToAdd.price &&
-      serviceToAdd.duration &&
+      serviceToAdd.name.trim() &&
+      serviceToAdd.duration.trim() &&
       serviceToAdd.category &&
-      serviceToAdd.description &&
-      serviceToAdd.image
+      serviceToAdd.description.trim() &&
+      serviceToAdd.image &&
+      serviceToAdd.price >= 0
     ) {
       const newService: Service = {
         id: '',
@@ -57,7 +78,6 @@ const AddServicesModal = () => {
         description: serviceToAdd.description,
         image: serviceToAdd.image,
       };
-
       mutate(newService, {
         onSuccess: () => {
           notifySuccess('Service Successfully Added');
@@ -80,6 +100,8 @@ const AddServicesModal = () => {
           }
         },
       });
+    } else {
+      setError(true);
     }
   };
   return (
@@ -137,12 +159,17 @@ const AddServicesModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="Enter service name"
             />
+            {error && !serviceToAdd.name && (
+              <p className="text-sm text-red-600">Enter a service name</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
-            <input
-              type="text"
+            <select
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+              name="category "
+              id="category"
               value={serviceToAdd.category}
               onChange={e =>
                 setServiceToAdd({
@@ -150,13 +177,20 @@ const AddServicesModal = () => {
                   category: e.target.value,
                 })
               }
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-              placeholder="e.g., Styling, Color, Treatment"
-            />
+            >
+              <option value="" disabled>
+                Select Category
+              </option>
+              {categories?.serviceCategories.map((cat, index) => (
+                <option key={index}>{cat}</option>
+              ))}
+            </select>
+            {error && !serviceToAdd.category && (
+              <p className="text-sm text-red-600">Select a category</p>
+            )}
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Price ($)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Price (€)</label>
             <input
               type="number"
               value={serviceToAdd.price}
@@ -169,6 +203,9 @@ const AddServicesModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="0.00"
             />
+            {error && !serviceToAdd.price && (
+              <p className="text-sm text-red-600">Enter a price greater than 0</p>
+            )}
           </div>
 
           <div>
@@ -185,6 +222,10 @@ const AddServicesModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="e.g., 60 min, 2 hrs"
             />
+
+            {error && !serviceToAdd.duration && (
+              <p className="text-sm text-red-600">Enter a duration</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Service Image</label>
@@ -268,13 +309,16 @@ const AddServicesModal = () => {
               rows={3}
               placeholder="Service description"
             />
+            {error && !serviceToAdd.description && (
+              <p className="text-sm text-red-600">Enter a description</p>
+            )}
           </div>
         </div>
 
         <button
-          onClick={handleCreateService}
-          disabled={isPending}
-          className="w-full mt-6 px-6 py-3 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all"
+          onClick={() => handleCreateService()}
+          // disabled={isPending}
+          className=" cursor-pointer w-full mt-6 px-6 py-3 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all"
         >
           {isPending ? 'Adding...' : 'Add Service'}
         </button>

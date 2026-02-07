@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GlobalContext } from '../context/GlobalContext';
 import type { Product } from '@salon/types';
@@ -7,10 +7,14 @@ import useCreateNewProduct from '../hooks/useCreateNewProduct';
 import { notifyError, notifySuccess } from '@salon/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useImageUpload } from '../hooks/useImageUpload';
+import { useGetCategories } from '@salon/hooks';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AddProductModal = () => {
   const globalContext = useContext(GlobalContext);
   const queryClient = useQueryClient();
+  const [error, setError] = useState<boolean>(false);
+
   const {
     data: newProduct,
     setData: setNewProduct,
@@ -29,14 +33,30 @@ const AddProductModal = () => {
     stock: 0,
     image: null,
   });
+  const {
+    data: categories,
+    isLoading: categoriesIsLoading,
+    isError: categoriesIsError,
+  } = useGetCategories(apiUrl);
 
   const { mutate, isPending } = useCreateNewProduct();
-
   useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-    };
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
   }, [imagePreview]);
+  if (categoriesIsLoading) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-slate-500">Loading Categories...</p>
+      </div>
+    );
+  }
+  if (categoriesIsError) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load Categories. Please try again.</p>
+      </div>
+    );
+  }
 
   const handleAddProduct = () => {
     if (
@@ -68,6 +88,8 @@ const AddProductModal = () => {
           }
         },
       });
+    } else {
+      setError(true);
     }
   };
   return (
@@ -125,12 +147,17 @@ const AddProductModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="Enter product name"
             />
+            {error && !newProduct.name && (
+              <p className="text-sm text-red-600">Enter a product name</p>
+            )}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
-            <input
-              type="text"
+          <div className="w-full">
+            <label className=" text-sm font-semibold text-slate-700 mb-2">Category</label>
+            <select
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+              name="category"
+              id="category"
               value={newProduct.category}
               onChange={e =>
                 setNewProduct({
@@ -138,9 +165,15 @@ const AddProductModal = () => {
                   category: e.target.value,
                 })
               }
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-              placeholder="e.g., Wigs, Equipment, Care"
-            />
+            >
+              <option value="" disabled>
+                Select Category
+              </option>
+              {categories?.shopCategories.map((cat, index) => <option key={index}>{cat}</option>)}
+            </select>
+            {error && !newProduct.category && (
+              <p className="text-sm text-red-600">Select a category</p>
+            )}
           </div>
 
           <div>
@@ -157,6 +190,9 @@ const AddProductModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="0.00"
             />
+            {error && !newProduct.price && (
+              <p className="text-sm text-red-600">Enter a price greater than 0</p>
+            )}
           </div>
 
           <div>
@@ -175,6 +211,9 @@ const AddProductModal = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
               placeholder="0"
             />
+            {error && !newProduct.stock && (
+              <p className="text-sm text-red-600">Enter stock quantity</p>
+            )}
           </div>
 
           <div>
@@ -260,6 +299,9 @@ const AddProductModal = () => {
               rows={3}
               placeholder="Product description"
             />
+            {error && !newProduct.description && (
+              <p className="text-sm text-red-600">Enter product description</p>
+            )}
           </div>
         </div>
 

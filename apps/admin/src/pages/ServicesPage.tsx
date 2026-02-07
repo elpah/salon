@@ -77,7 +77,9 @@ const ServicesPage = () => {
                 </div>
                 <button
                   onClick={() => {
-                    service.id && handleDeleteService(service.id);
+                    if (service.id) {
+                      handleDeleteService(service.id);
+                    }
                   }}
                   className="text-red-600 hover:text-red-700 p-2"
                 >
