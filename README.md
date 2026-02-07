@@ -65,6 +65,7 @@ The architecture allows **separate deployment** of web, admin, and API while sha
 
 ## Project Structure
 
+```bash 
 ├── apps/
 │ ├── admin/ # Admin dashboard application
 │ ├── web/ # Salon website
@@ -77,6 +78,7 @@ The architecture allows **separate deployment** of web, admin, and API while sha
 ├── .gitignore
 └── package.json
 
+```
 
 ---
 
