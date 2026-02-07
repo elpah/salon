@@ -12,8 +12,6 @@
 - [Project Structure](#project-structure)  
 - [Setup](#setup)  
 - [Formatting & Linting](#formatting--linting)  
-- [Development](#development)  
-- [Build & Deployment](#build--deployment)  
 - [Future Improvements](#future-improvements)  
 
 ---
