@@ -1,35 +1,39 @@
 import { Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useServices } from '@salon/hooks';
+import { useGetCategories, useServices } from '@salon/hooks';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Services = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<'all' | 'styling' | 'color' | 'treatment' | 'extensions'>(
-    'all'
-  );
+  const [filter, setFilter] = useState<string>('all');
 
   const { data: services, isLoading, isError } = useServices(apiUrl);
+  const {
+    data: categories,
+    isLoading: categoriesIsLoading,
+    isError: categoriesIsError,
+  } = useGetCategories(apiUrl);
 
-  if (isLoading) {
+  if (isLoading || categoriesIsLoading) {
     return (
       <div className="text-center py-16">
         <p className="text-slate-500">Loading products...</p>
       </div>
     );
   }
-  if (isError) {
+  if (isError || categoriesIsError) {
     return (
       <div className="text-center py-16">
         <p className="text-red-500">Failed to load products. Please try again.</p>
       </div>
     );
   }
-
   const filteredServices =
-    filter === 'all' ? services : services?.filter(s => s.category === filter);
+    filter === 'all'
+      ? services
+      : services?.filter(s => s.category.toLowerCase() === filter.toLowerCase());
 
   return (
     <div className="pt-24 pb-24">
@@ -44,13 +48,11 @@ const Services = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {['all', 'styling', 'color', 'treatment', 'extensions'].map(cat => (
+          {['all', ...(categories?.serviceCategories ?? [])].map(cat => (
             <button
               key={cat}
-              onClick={() =>
-                setFilter(cat as 'all' | 'styling' | 'color' | 'treatment' | 'extensions')
-              }
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === cat ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+              onClick={() => setFilter(cat)}
+              className={`cursor-pointer px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === cat ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
             </button>
@@ -65,7 +67,7 @@ const Services = () => {
             >
               <div className="w-full sm:w-40 h-40 shrink-0 overflow-hidden rounded-xl">
                 <img
-                  src={service.image}
+                  src={service.image as string}
                   alt={service.name}
                   className="w-full h-full object-cover transition-transform group-hover:scale-110"
                 />

@@ -8,6 +8,8 @@ export interface Product {
   category: "wigs" | "equipment" | "care" | string;
   image:File| string | null;
   description: string;
+  quantity?:number;
+  status?:string;
 }
 
 export interface UseProductsResult {

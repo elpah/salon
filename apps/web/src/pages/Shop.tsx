@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
-import { useProducts } from '@salon/hooks';
+import { useGetCategories, useProducts } from '@salon/hooks';
 import { Product } from '@salon/types';
 import { GlobalContext } from '@/context/GlobalContext';
 
@@ -9,9 +9,13 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const Shop = () => {
   const globalContext = useContext(GlobalContext);
-  const [activeCategory, setActiveCategory] = useState<'all' | 'wigs' | 'equipment' | 'care'>(
-    'all'
-  );
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const { data: products, isLoading, isError } = useProducts(apiUrl);
+  const {
+    data: categories,
+    isLoading: categoriesIsLoading,
+    isError: categoriesIsError,
+  } = useGetCategories(apiUrl);
 
   function addToCart(cart: Product[], product: Product): Product[] {
     const existingItem = cart.find(item => item.id === product.id);
@@ -25,16 +29,14 @@ const Shop = () => {
     return [...cart, { ...product, quantity: 1 }];
   }
 
-  const { data: products, isLoading, isError } = useProducts(apiUrl);
-
-  if (isLoading) {
+  if (isLoading || categoriesIsLoading) {
     return (
       <div className="text-center py-16">
         <p className="text-slate-500">Loading products...</p>
       </div>
     );
   }
-  if (isError) {
+  if (isError || categoriesIsError) {
     return (
       <div className="text-center py-16">
         <p className="text-red-500">Failed to load products. Please try again.</p>
@@ -43,7 +45,9 @@ const Shop = () => {
   }
 
   const filteredProducts =
-    activeCategory === 'all' ? products : products?.filter(p => p.category === activeCategory);
+    activeCategory === 'all'
+      ? products
+      : products?.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase());
 
   return (
     <div className="pt-24 pb-24">
@@ -56,11 +60,11 @@ const Shop = () => {
             </p>
           </div>
           <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
-            {['all', 'wigs', 'equipment', 'care'].map(cat => (
+            {['all', ...(categories?.shopCategories ?? [])].map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat as 'all' | 'wigs' | 'equipment' | 'care')}
-                className={`px-2 sm:px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === cat ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                onClick={() => setActiveCategory(cat)}
+                className={`cursor-pointer px-2 sm:px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === cat ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 {cat}
               </button>

@@ -3,4 +3,5 @@ export * from "./service";
 export {type AvailabilityWindow,type UseAvailabilityResult} from "./availabilityWindow"
 export * from "./bookedSlots"
 export * from "./bookingType";
+export * from "./categories"
 

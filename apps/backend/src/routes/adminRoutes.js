@@ -7,16 +7,16 @@ import {
   getAllProducts,
   getProductById,
   deleteProductById,
-  permanentlyDeleteProductById,
-  restoreDeletedProductById,
+  // permanentlyDeleteProductById,
+  // restoreDeletedProductById,
 } from "../services/admin-services/product.services.js";
 
 import {
   getAllServices,
   getServiceById,
   deleteServiceById,
-  permanentlyDeleteServiceById,
-  restoreDeletedServiceById,
+  // permanentlyDeleteServiceById,
+  // restoreDeletedServiceById,
   addNewService,
 } from "../services/admin-services/service.services.js";
 import {
@@ -30,6 +30,9 @@ import {
   createNewBooking,
   getAllBookings,
 } from "../services/admin-services/bookings.services.js";
+
+import {getCategories}
+from "../services/admin-services/categories.services.js"
 
 const adminRoute = Router();
 const storage = multer.memoryStorage();
@@ -111,91 +114,93 @@ adminRoute.delete("/delete-service/:id", async (req, res) => {
   }
 });
 
-adminRoute.delete("/delete-product-forever/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await permanentlyDeleteProductById(id);
-    if (result.success) {
-      res.status(200).json({ message: "Product deleted successfully" });
-    } else {
-      res.status(400).json({ message: result.message });
-    }
-  } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error deleting product:", err);
-    }
-    res.status(500).send("Internal Server Error");
-  }
-});
+// Add to Future Improvements
 
-adminRoute.delete("/delete-service-forever/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await permanentlyDeleteServiceById(id);
-    if (result.success) {
-      res.status(200).json({ message: "Service deleted successfully" });
-    } else {
-      res.status(400).json({ message: result.message });
-    }
-  } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error deleting Service:", err);
-    }
-    res.status(500).send("Internal Server Error");
-  }
-});
+// adminRoute.delete("/delete-product-forever/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const result = await permanentlyDeleteProductById(id);
+//     if (result.success) {
+//       res.status(200).json({ message: "Product deleted successfully" });
+//     } else {
+//       res.status(400).json({ message: result.message });
+//     }
+//   } catch (err) {
+//     if (process.env.NODE_ENV !== "production") {
+//       console.error("Error deleting product:", err);
+//     }
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
-adminRoute.post("/restore-product/:id", async (req, res) => {
-  const { id } = req.params;
+// adminRoute.delete("/delete-service-forever/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const result = await permanentlyDeleteServiceById(id);
+//     if (result.success) {
+//       res.status(200).json({ message: "Service deleted successfully" });
+//     } else {
+//       res.status(400).json({ message: result.message });
+//     }
+//   } catch (err) {
+//     if (process.env.NODE_ENV !== "production") {
+//       console.error("Error deleting Service:", err);
+//     }
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
-  try {
-    const result = await restoreDeletedProductById(id);
+// adminRoute.post("/restore-product/:id", async (req, res) => {
+//   const { id } = req.params;
 
-    if (!result.success) {
-      return res.status(404).json({
-        message: result.message || "Product not found",
-      });
-    }
+//   try {
+//     const result = await restoreDeletedProductById(id);
 
-    return res.status(200).json({
-      message: "Product restored successfully",
-    });
-  } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error restoring product:", err);
-    }
+//     if (!result.success) {
+//       return res.status(404).json({
+//         message: result.message || "Product not found",
+//       });
+//     }
 
-    return res.status(500).json({
-      message: "Internal Server Error",
-    });
-  }
-});
+//     return res.status(200).json({
+//       message: "Product restored successfully",
+//     });
+//   } catch (err) {
+//     if (process.env.NODE_ENV !== "production") {
+//       console.error("Error restoring product:", err);
+//     }
 
-adminRoute.post("/restore-service/:id", async (req, res) => {
-  const { id } = req.params;
+//     return res.status(500).json({
+//       message: "Internal Server Error",
+//     });
+//   }
+// });
 
-  try {
-    const result = await restoreDeletedServiceById(id);
+// adminRoute.post("/restore-service/:id", async (req, res) => {
+//   const { id } = req.params;
 
-    if (!result.success) {
-      return res.status(404).json({
-        message: result.message || "Service not found",
-      });
-    }
+//   try {
+//     const result = await restoreDeletedServiceById(id);
 
-    return res.status(200).json({
-      message: "Service restored successfully",
-    });
-  } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error restoring Service:", err);
-    }
+//     if (!result.success) {
+//       return res.status(404).json({
+//         message: result.message || "Service not found",
+//       });
+//     }
 
-    return res.status(500).json({
-      message: "Internal Server Error",
-    });
-  }
-});
+//     return res.status(200).json({
+//       message: "Service restored successfully",
+//     });
+//   } catch (err) {
+//     if (process.env.NODE_ENV !== "production") {
+//       console.error("Error restoring Service:", err);
+//     }
+
+//     return res.status(500).json({
+//       message: "Internal Server Error",
+//     });
+//   }
+// });
 
 adminRoute.post("/create-new-availability", async (req, res) => {
   try {
@@ -243,6 +248,15 @@ adminRoute.get("/bookings", async (_req, res) => {
   try {
     const bookings = await getAllBookings();
     res.status(200).json(bookings);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+adminRoute.get("/categories", async (_req, res) => {
+  try {
+    const categories = await getCategories();
+    res.status(200).json(categories);
   } catch (err) {
     return res.status(500).json({ message: "Internal server error" });
   }

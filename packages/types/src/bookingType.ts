@@ -1,3 +1,5 @@
+import type { QueryObserverResult } from "@tanstack/react-query";
+
 export type SelectedSlot = {
   date: string;
   startTime: string;
@@ -26,3 +28,10 @@ export type BookingType = {
     phone: string;
   };
 };
+
+export interface GetBookingResult {
+  data: BookingType[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => Promise<QueryObserverResult<BookingType[], Error>>;
+}

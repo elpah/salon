@@ -10,9 +10,10 @@ import {
   AvailableSlotByDate,
 } from '@salon/types';
 import { motion } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Home } from 'lucide-react';
 import { useReducer, useState } from 'react';
 import { notifyError, notifySuccess } from '@salon/ui';
+import { useNavigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -56,6 +57,7 @@ const BookAppointment = () => {
   const [step, setStep] = useState(1);
   const [state, dispatch] = useReducer(bookingReducer, initialBookingState);
   const { mutate, isPending } = useCreateNewBooking();
+  const navigate = useNavigate();
 
   const { data: services, isLoading, isError } = useServices(apiUrl);
   const { data: availabilityWindow, isLoading: availabilityIsLoading } =
@@ -153,8 +155,9 @@ const BookAppointment = () => {
 
       mutate(newBooking, {
         onSuccess: () => {
-          notifySuccess('Availability Successfully Added');
-          dispatch({ type: 'RESET' });
+          setStep(5);
+          // notifySuccess('Availability Successfully Added');
+          // dispatch({ type: 'RESET' });
         },
         onError: err => {
           notifyError('Something went wrong while submitting.');
@@ -174,7 +177,7 @@ const BookAppointment = () => {
             <h1 className="text-3xl font-serif font-bold mb-4">Book Your Transformation</h1>
             <p className="text-slate-400 text-sm">Secure your appointment in just a few clicks.</p>
             <div className="flex mt-8 space-x-4">
-              {[1, 2, 3, 4].map(s => (
+              {[1, 2, 3, 4, 5].map(s => (
                 <div key={s} className="flex items-center">
                   <div
                     className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
@@ -185,7 +188,7 @@ const BookAppointment = () => {
                   >
                     {s}
                   </div>
-                  {s < 4 && (
+                  {s < 5 && (
                     <div
                       className={`w-12 h-0.5 ml-4 ${step > s ? 'bg-rose-600' : 'bg-slate-700'}`}
                     />
@@ -227,7 +230,7 @@ const BookAppointment = () => {
                 <button
                   disabled={!state.selectedService}
                   onClick={() => setStep(2)}
-                  className="mt-8 w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
+                  className="cursor-pointer mt-8 w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                 >
                   Continue to Schedule
                 </button>
@@ -243,7 +246,7 @@ const BookAppointment = () => {
                     <button
                       key={slot.date}
                       onClick={() => dispatch({ type: 'SET_DATE', payload: slot.date })}
-                      className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
+                      className={`cursor-pointer  py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
                         state.selectedDate === slot.date
                           ? 'border-rose-600 bg-rose-50 text-rose-600'
                           : 'border-slate-100 hover:border-slate-200 text-slate-600'
@@ -287,14 +290,14 @@ const BookAppointment = () => {
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => setStep(1)}
-                    className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                    className=" cursor-pointer  flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                   >
                     Back
                   </button>
                   <button
                     disabled={!state.selectedSlot}
                     onClick={() => setStep(3)}
-                    className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
+                    className=" cursor-pointer  flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                   >
                     Continue
                   </button>
@@ -341,7 +344,7 @@ const BookAppointment = () => {
                 <div className="flex gap-4">
                   <button
                     onClick={() => setStep(2)}
-                    className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                    className="cursor-pointer  flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                   >
                     Back
                   </button>
@@ -352,7 +355,7 @@ const BookAppointment = () => {
                       !state.clientDetails.phone
                     }
                     onClick={() => setStep(4)}
-                    className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
+                    className="cursor-pointer  flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-slate-900 transition-all"
                   >
                     Review Booking
                   </button>
@@ -402,22 +405,66 @@ const BookAppointment = () => {
                   <div className="flex gap-4">
                     <button
                       onClick={() => setStep(3)}
-                      className="flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                      className=" cursor-pointer  flex-1 py-4 border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                     >
                       Back
                     </button>
                     <button
                       onClick={() => {
                         createNewBooking();
-                        console.log(state);
-                        alert('Booking Successful! You will receive a confirmation email shortly.');
-                        // setStep(1);
+                        // console.log(state);
+                        // alert('Booking Successful! You will receive a confirmation email shortly.');
                       }}
-                      className="flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
+                      className=" cursor-pointer  flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
                     >
                       Complete Booking
                     </button>
                   </div>
+                </div>
+              </motion.div>
+            )}
+            {step == 5 && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+              >
+                <div className="text-center ">
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100 text-green-600 mb-6">
+                    <CheckCircle className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-3xl font-serif font-bold text-slate-900 mb-4">
+                    Appointment Confirmed!
+                  </h3>
+                  <p className="text-lg text-slate-600 mb-2">
+                    Your appointment has been successfully booked.
+                  </p>
+                  <p className="text-slate-500 mb-8">
+                    You will receive a confirmation email shortly at {state.clientDetails.email}
+                  </p>
+
+                  <div className="bg-slate-50 rounded-xl p-6 mb-8 inline-block">
+                    <p className="text-sm text-slate-500 mb-2">Appointment Details</p>
+                    <p className="text-md font-bold text-slate-900 mb-1">
+                      {services?.find(s => s.id === state.selectedService)?.name}
+                    </p>
+                    <p className="text-slate-600">
+                      {formatDate(state.selectedDate)} at {state.selectedSlot?.startTime}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => navigate('/')}
+                    className=" cursor-pointer  px-8 py-4 bg-rose-600 text-white rounded-full font-bold hover:bg-rose-700 transition-all inline-flex items-center shadow-lg shadow-rose-600/20"
+                  >
+                    <Home className="mr-2 h-5 w-5" />
+                    Return to Home
+                  </button>
                 </div>
               </motion.div>
             )}

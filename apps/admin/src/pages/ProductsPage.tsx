@@ -55,7 +55,7 @@ const ProductsPage = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {products && products.length > 0 ? (
           products.map((product: Product) => (
             <div
@@ -75,6 +75,16 @@ const ProductsPage = () => {
                     <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
                     <p className="text-sm text-slate-500">{product.category}</p>
                   </div>
+
+                  {
+                    //Future Improvement
+                    /* {product.status === 'deleted' && (
+                    <button className="inline-flex items-center gap-2 rounded-md border border-green-600 px-3 py-1.5 text-sm font-medium text-green-600 hover:bg-green-50 transition">
+                      <RotateCcw className="h-4 w-4" />
+                      Restore
+                    </button>
+                  )} */
+                  }
                   <button
                     onClick={() => product.id && handleDeleteProduct(product.id)}
                     className="text-red-600 hover:text-red-700 p-2"
