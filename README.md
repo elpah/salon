@@ -22,7 +22,7 @@ This monorepo contains:
 
 1. **Admin Dashboard** (`apps/admin`) – Manage bookings, services, products, and view analytics.  
 2. **Salon Website** (`apps/web`) – Customer-facing site for browsing services and booking appointments.  
-3. **Backend API** (`apps/api`) – RESTful API built with Node.js/Express and MongoDB for persistent data storage.  
+3. **Backend API** (`apps/backend`) – RESTful API built with Node.js/Express and MongoDB for persistent data storage.  
 4. **Shared Packages** (`packages/`) – Includes reusable hooks, types, and UI components.  
 
 The architecture allows **separate deployment** of web, admin, and API while sharing logic and types across the monorepo.
