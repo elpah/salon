@@ -10,7 +10,8 @@ const AdminPage = lazy(() => import('./pages/AdminPage'));
 function App() {
   const [showAddSlotModal, setShowAddSlotModal] = useState<boolean>(false);
   const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false);
-  const [showAddServicesModal, setshowAddServicesModal] = useState<boolean>(false);
+  const [showAddServicesModal, setShowAddServicesModal] = useState<boolean>(false);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState<boolean>(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
 
@@ -32,9 +33,11 @@ function App() {
         products,
         setProducts,
         showAddServicesModal,
-        setshowAddServicesModal,
+        setShowAddServicesModal,
         showConfirmationModal,
         setShowConfirmationModal,
+        showAddCategoryModal,
+        setShowAddCategoryModal,
       }}
     >
       <div className="app-container">

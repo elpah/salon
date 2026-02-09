@@ -9,9 +9,11 @@ export interface IGlobalContext {
   products: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   showAddServicesModal: boolean;
-  setshowAddServicesModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowAddServicesModal: React.Dispatch<React.SetStateAction<boolean>>;
   showConfirmationModal: boolean;
   setShowConfirmationModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showAddCategoryModal:boolean;
+  setShowAddCategoryModal:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const GlobalContext = createContext<IGlobalContext>({
@@ -22,7 +24,9 @@ export const GlobalContext = createContext<IGlobalContext>({
   products: [],
   setProducts: () => {},
   showAddServicesModal: false,
-  setshowAddServicesModal: () => {},
+  setShowAddServicesModal: () => {},
   showConfirmationModal: false,
   setShowConfirmationModal: () => {},
+  showAddCategoryModal: false,
+  setShowAddCategoryModal:() => {},
 });

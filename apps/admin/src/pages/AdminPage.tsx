@@ -8,9 +8,10 @@ import ServicesPage from './ServicesPage';
 import Sidebar from '../components/Sidebar';
 import { Menu, Plus } from 'lucide-react';
 import { GlobalContext } from '../context/GlobalContext';
+import CategoryPage from './CategoryPage';
 
 // --- Types ---
-type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services';
+type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services' | 'categories';
 
 // --- Main Admin Dashboard Component ---
 export const AdminDashboard = () => {
@@ -41,6 +42,10 @@ export const AdminDashboard = () => {
       case 'services':
         setHeader('Services');
         setSubHeader('Manage your salon services');
+        break;
+      case 'categories':
+        setHeader('Categories');
+        setSubHeader('Manage product and service categories');
         break;
     }
   }, [currentPage]);
@@ -73,7 +78,12 @@ export const AdminDashboard = () => {
     services: {
       showButton: true,
       label: 'Add Service',
-      action: () => globalContext.setshowAddServicesModal(true),
+      action: () => globalContext.setShowAddServicesModal(true),
+    },
+    categories: {
+      showButton: true,
+      label: 'Add Category',
+      action: () => globalContext.setShowAddCategoryModal(true),
     },
   };
 
@@ -89,6 +99,8 @@ export const AdminDashboard = () => {
         return <ProductsPage />;
       case 'services':
         return <ServicesPage />;
+      case 'categories':
+        return <CategoryPage />;
       default:
         return <BookingsPage />;
     }

@@ -91,7 +91,7 @@ const AddServicesModal = () => {
             category: '',
             image: null,
           });
-          globalContext.setshowAddServicesModal(false);
+          globalContext.setShowAddServicesModal(false);
         },
         onError: (err: unknown) => {
           notifyError('Something went wrong while submitting.');
@@ -116,7 +116,7 @@ const AddServicesModal = () => {
         opacity: 0,
       }}
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={() => globalContext.setshowAddServicesModal(false)}
+      onClick={() => globalContext.setShowAddServicesModal(false)}
     >
       <motion.div
         initial={{
@@ -137,7 +137,7 @@ const AddServicesModal = () => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-slate-900">Add Service</h3>
           <button
-            onClick={() => globalContext.setshowAddServicesModal(false)}
+            onClick={() => globalContext.setShowAddServicesModal(false)}
             className="text-slate-400 hover:text-slate-600"
           >
             <X className="h-6 w-6" />

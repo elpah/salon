@@ -12,7 +12,7 @@ import {
 import { motion } from 'framer-motion';
 import { CheckCircle, Home } from 'lucide-react';
 import { useReducer, useState } from 'react';
-import { notifyError, notifySuccess } from '@salon/ui';
+import { notifyError } from '@salon/ui';
 import { useNavigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -156,7 +156,6 @@ const BookAppointment = () => {
       mutate(newBooking, {
         onSuccess: () => {
           setStep(5);
-          // notifySuccess('Availability Successfully Added');
           // dispatch({ type: 'RESET' });
         },
         onError: err => {
@@ -241,52 +240,120 @@ const BookAppointment = () => {
             {step === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <h3 className="text-xl font-bold mb-6">Choose Date & Time</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                  {availableSlots.map(slot => (
-                    <button
-                      key={slot.date}
-                      onClick={() => dispatch({ type: 'SET_DATE', payload: slot.date })}
-                      className={`cursor-pointer  py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
-                        state.selectedDate === slot.date
-                          ? 'border-rose-600 bg-rose-50 text-rose-600'
-                          : 'border-slate-100 hover:border-slate-200 text-slate-600'
-                      }`}
-                    >
-                      {formatDate(slot.date)}
-                    </button>
-                  ))}
-                </div>
+                {availableSlots.length === 0 ? (
+                  <div className="text-sm text-slate-500 italic bg-slate-50 border border-slate-200 rounded-lg p-4 text-center">
+                    No dates available. Please check again later.
+                  </div>
+                ) : (
+                  <div>
+                    {/* Date buttons */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                      {availableSlots.map(slot => (
+                        <button
+                          key={slot.date}
+                          onClick={() => dispatch({ type: 'SET_DATE', payload: slot.date })}
+                          className={`py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
+                            state.selectedDate === slot.date
+                              ? 'border-rose-600 bg-rose-50 text-rose-600'
+                              : 'border-slate-100 hover:border-slate-200 text-slate-600'
+                          }`}
+                        >
+                          {formatDate(slot.date)}
+                        </button>
+                      ))}
+                    </div>
 
-                {state.selectedDate && selectedSlotDay && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedSlotDay.times.map(slot => (
-                      <div
-                        key={`${slot.startTime}-${slot.endTime}`}
-                        onClick={() =>
-                          dispatch({
-                            type: 'SET_SLOT',
-                            payload: {
-                              date: state.selectedDate,
-                              startTime: slot.startTime,
-                              endTime: slot.endTime,
-                            },
-                          })
-                        }
-                        className={`p-4 rounded-lg border cursor-pointer flex flex-col gap-1 ${
-                          state.selectedSlot?.startTime === slot.startTime
-                            ? 'border-rose-600 bg-rose-50'
-                            : 'border-slate-200'
-                        }`}
-                      >
-                        <span className="font-bold">
-                          {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-                        </span>
-                        <span className="text-xs text-slate-400">{slot.duration} min</span>
-                      </div>
-                    ))}
+                    {/* Time slots */}
+                    {state.selectedDate && (
+                      <>
+                        {selectedSlotDay?.times?.length === 0 ? (
+                          <div className="text-sm text-slate-500 italic bg-slate-50 border border-slate-200 rounded-lg p-4 text-center">
+                            No time slots available for this date.
+                          </div>
+                        ) : (
+                          selectedSlotDay && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                              {selectedSlotDay.times.map(slot => (
+                                <div
+                                  key={`${slot.startTime}-${slot.endTime}`}
+                                  onClick={() =>
+                                    dispatch({
+                                      type: 'SET_SLOT',
+                                      payload: {
+                                        date: state.selectedDate,
+                                        startTime: slot.startTime,
+                                        endTime: slot.endTime,
+                                      },
+                                    })
+                                  }
+                                  className={`p-4 rounded-lg border cursor-pointer flex flex-col gap-1 ${
+                                    state.selectedSlot?.startTime === slot.startTime
+                                      ? 'border-rose-600 bg-rose-50'
+                                      : 'border-slate-200'
+                                  }`}
+                                >
+                                  <span className="font-bold">
+                                    {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                                  </span>
+                                  <span className="text-xs text-slate-400">
+                                    {slot.duration} min
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
 
+                {/* {availableSlots ?  (<div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                    {availableSlots.map(slot => (
+                      <button
+                        key={slot.date}
+                        onClick={() => dispatch({ type: 'SET_DATE', payload: slot.date })}
+                        className={`cursor-pointer  py-3 px-2 rounded-lg border-2 text-xs font-bold transition-all ${
+                          state.selectedDate === slot.date
+                            ? 'border-rose-600 bg-rose-50 text-rose-600'
+                            : 'border-slate-100 hover:border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {formatDate(slot.date)}
+                      </button>
+                    ))}
+                  </div>
+                  {state.selectedDate && selectedSlotDay && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {selectedSlotDay.times.map(slot => (
+                        <div
+                          key={`${slot.startTime}-${slot.endTime}`}
+                          onClick={() =>
+                            dispatch({
+                              type: 'SET_SLOT',
+                              payload: {
+                                date: state.selectedDate,
+                                startTime: slot.startTime,
+                                endTime: slot.endTime,
+                              },
+                            })
+                          }
+                          className={`p-4 rounded-lg border cursor-pointer flex flex-col gap-1 ${
+                            state.selectedSlot?.startTime === slot.startTime
+                              ? 'border-rose-600 bg-rose-50'
+                              : 'border-slate-200'
+                          }`}
+                        >
+                          <span className="font-bold">
+                            {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                          </span>
+                          <span className="text-xs text-slate-400">{slot.duration} min</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>): <div>No Slots available</div>} */}
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => setStep(1)}

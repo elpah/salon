@@ -19,9 +19,9 @@ const createNewBooking = async (booking) => {
     if (existing) {
       throw new Error("This time slot is already booked");
     }
-    const bookedSlotId = randomUUID();
+    const selectedSlot = randomUUID();
     const bookedSlot = {
-      id: bookedSlotId,
+      id: selectedSlot,
       serviceId: booking.selectedService,
       userId: booking.userId || null,
       date,
@@ -38,18 +38,18 @@ const createNewBooking = async (booking) => {
     const bookingDoc = {
       id: randomUUID(),
       serviceId: booking.selectedService,
-      bookedSlotId,
+      selectedSlot,
       clientDetails: booking.clientDetails,
       createdAt: new Date(),
     };
     const bookingResult = await bookingCol.insertOne(bookingDoc);
     if (!bookingResult.acknowledged) {
-      await bookedSlotCol.deleteOne({ id: bookedSlotId });
+      await bookedSlotCol.deleteOne({ id: selectedSlot });
       throw new Error("Booking creation failed, slot reservation rolled back");
     }
     return {
       bookingId: bookingResult.insertedId,
-      bookedSlotId,
+      selectedSlot,
     };
   } catch (error) {
     throw new Error(error?.message || "Failed to create booking");
