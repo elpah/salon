@@ -3,19 +3,19 @@ import { Trash2, Clock } from 'lucide-react';
 import { useContext, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 import AddSlotModal from '../components/AddSlotModal';
-import useGetAvailability from '../hooks/useGetAvailability';
+import { useGetAvailabilities } from '@salon/hooks';
 import useDeleteAvailability from '../hooks/useDeleteAvailability';
 import ShowModal from '../components/modal/ShowModal';
 import type { AvailabilityWindow } from '@salon/types';
 import { notifyError, notifySuccess } from '@salon/ui';
 import Loading from '../components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const AvailabilityPage = () => {
   const globalContext = useContext(GlobalContext);
   const [avaibabilityIdToDelete, setAvaibabilityIdToDelete] = useState<string | null>(null);
-  const { data: availabilities, isLoading, isError, refetch } = useGetAvailability(apiUrl);
+  const { data: availabilities, isLoading, isError, refetch } = useGetAvailabilities(sharedApiUrl);
   const { mutate: deleteAvailability } = useDeleteAvailability();
 
   const handleDeleteAvailability = (id: string) => {

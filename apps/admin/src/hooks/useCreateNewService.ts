@@ -16,7 +16,7 @@ const useCreateNewService = () => {
       }
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/create-new-service`,
+          `${import.meta.env.VITE_ADMIN_API_URL}/create-new-service`,
           formData,
           {
             headers: {

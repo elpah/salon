@@ -10,11 +10,12 @@ import ShowModal from '../components/modal/ShowModal';
 import { notifyError, notifySuccess } from '@salon/ui';
 import Loading from '../components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
+
 const ProductsPage = () => {
   const globalContext = useContext(GlobalContext);
   const [productIdToDelete, setProductIdToDelete] = useState<string | null>(null);
-  const { data: products, isLoading, isError, refetch } = useProducts(apiUrl);
+  const { data: products, isLoading, isError, refetch } = useProducts(sharedApiUrl);
 
   const { mutate: deleteProduct } = useDeleteProduct();
 

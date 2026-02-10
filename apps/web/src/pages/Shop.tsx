@@ -5,17 +5,17 @@ import { useGetCategories, useProducts } from '@salon/hooks';
 import { Product } from '@salon/types';
 import { GlobalContext } from '@/context/GlobalContext';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const Shop = () => {
   const globalContext = useContext(GlobalContext);
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const { data: products, isLoading, isError } = useProducts(apiUrl);
+  const { data: products, isLoading, isError } = useProducts(sharedApiUrl);
   const {
     data: categories,
     isLoading: categoriesIsLoading,
     isError: categoriesIsError,
-  } = useGetCategories(apiUrl);
+  } = useGetCategories(sharedApiUrl);
 
   function addToCart(cart: Product[], product: Product): Product[] {
     const existingItem = cart.find(item => item.id === product.id);

@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, Star, CheckCircle, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
+
 const Homepage = () => {
   const navigate = useNavigate();
-  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const { data: services, isLoading, isError } = useServices(sharedApiUrl);
 
   if (isLoading) {
     return <Loading />;

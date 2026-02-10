@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import adminRoute from "./routes/adminRoutes.js";
-// import clientRoute from "./routes/clientRoutes.js";
+import sharedRoute from "./routes/sharedRoutes.js";
+import clientRoute from "./routes/clientRoutes.js";
 // import webhookRoute from "./routes/webhookRoute.js";
 
 
@@ -14,7 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/admin/api/", adminRoute);
-// app.use("/client/api/", clientRoute);
+app.use("/shared-route/api/", sharedRoute);
+app.use("/client/api/", clientRoute);
 
 app.get("/health", (_, res) => res.json({ ok: true }));
 

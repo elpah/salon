@@ -4,18 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { useGetCategories, useServices } from '@salon/hooks';
 import Loading from '@/components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const Services = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<string>('all');
 
-  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const { data: services, isLoading, isError } = useServices(sharedApiUrl);
   const {
     data: categories,
     isLoading: categoriesIsLoading,
     isError: categoriesIsError,
-  } = useGetCategories(apiUrl);
+  } = useGetCategories(sharedApiUrl);
 
   if (isLoading || categoriesIsLoading) {
     return <Loading />;

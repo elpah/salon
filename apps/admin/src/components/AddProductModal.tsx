@@ -8,7 +8,8 @@ import { notifyError, notifySuccess } from '@salon/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useGetCategories } from '@salon/hooks';
-const apiUrl = import.meta.env.VITE_API_URL;
+
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const AddProductModal = () => {
   const globalContext = useContext(GlobalContext);
@@ -37,7 +38,7 @@ const AddProductModal = () => {
     data: categories,
     isLoading: categoriesIsLoading,
     isError: categoriesIsError,
-  } = useGetCategories(apiUrl);
+  } = useGetCategories(sharedApiUrl);
 
   const { mutate, isPending } = useCreateNewProduct();
   useEffect(() => {

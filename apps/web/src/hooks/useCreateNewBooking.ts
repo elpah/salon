@@ -7,7 +7,7 @@ const useCreateNewBooking = () => {
     mutationFn: async (newBooking: BookingType) => {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/create-new-booking`,
+          `${import.meta.env.VITE_CLIENT_API_URL}/create-new-booking`,
           newBooking
         );
         return response.data;

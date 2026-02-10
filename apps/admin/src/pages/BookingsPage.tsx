@@ -2,10 +2,10 @@ import Loading from '../components/Loading';
 import { useGetBookings } from '../hooks/useGetBookings';
 import type { BookingType } from '@salon/types';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const adminApiUrl = import.meta.env.VITE_ADMIN_API_URL;
 
 const BookingsPage = () => {
-  const { data: bookings, isLoading, isError } = useGetBookings(apiUrl);
+  const { data: bookings, isLoading, isError } = useGetBookings(adminApiUrl);
 
   // const getStatusColor = (status: string) => {
   //   switch (status) {

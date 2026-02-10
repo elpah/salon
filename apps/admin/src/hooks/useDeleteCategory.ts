@@ -13,7 +13,7 @@ const deleteCategory = async ({ name, type }: CategoryPayload) => {
 
   //   const token = await user.getIdToken();
 
-  const response = await axios.delete(`${import.meta.env.VITE_API_URL}/delete-category/`, {
+  const response = await axios.delete(`${import.meta.env.VITE_ADMIN_API_URL}/delete-category/`, {
     params: { name, type },
     headers: {
       //   Authorization: `Bearer ${token}`,

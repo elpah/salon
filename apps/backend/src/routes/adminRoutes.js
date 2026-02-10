@@ -4,16 +4,12 @@ import { uploadImage } from "../services/admin-services/cloudinary.services.js";
 
 import {
   addNewProduct,
-  getAllProducts,
-  getProductById,
   deleteProductById,
   // permanentlyDeleteProductById,
   // restoreDeletedProductById,
 } from "../services/admin-services/product.services.js";
 
 import {
-  getAllServices,
-  getServiceById,
   deleteServiceById,
   // permanentlyDeleteServiceById,
   // restoreDeletedServiceById,
@@ -21,18 +17,14 @@ import {
 } from "../services/admin-services/service.services.js";
 import {
   createAvailabilityWindow,
-  getAllAvailabilities,
   deleteAvailabilityById,
-  getBookedSlots,
 } from "../services/admin-services/availability.services.js";
 
 import {
-  createNewBooking,
   getAllBookings,
 } from "../services/admin-services/bookings.services.js";
 
 import {
-  getCategories,
   createNewCategory,
   deleteCategory,
 } from "../services/admin-services/categories.services.js";
@@ -45,43 +37,6 @@ adminRoute.get("/", async (_req, res) => {
   res.status(200).json({ message: "arrived" });
 });
 
-adminRoute.get("/products", async (_req, res) => {
-  try {
-    const products = await getAllProducts();
-    res.status(200).json(products);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-adminRoute.get("/services", async (_req, res) => {
-  try {
-    const services = await getAllServices();
-    res.status(200).json(services);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-adminRoute.get("/services/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const service = await getServiceById(id);
-    res.status(200).json(service);
-  } catch (err) {
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-adminRoute.get("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const product = await getProductById(id);
-    res.status(200).json(product);
-  } catch (err) {
-    res.status(500).send("Internal Server Error");
-  }
-});
 
 adminRoute.delete("/delete-product/:id", async (req, res) => {
   const { id } = req.params;
@@ -221,32 +176,6 @@ adminRoute.post("/create-new-availability", async (req, res) => {
   }
 });
 
-adminRoute.post("/create-new-booking", async (req, res) => {
-  try {
-    const result = await createNewBooking(req.body);
-    return res.status(201).json({
-      message: "Booking created successfully",
-      bookingId: result.bookingId,
-      bookedSlotId: result.bookedSlotId,
-    });
-  } catch (err) {
-    console.error("Error in /create-new-booking:", err.message);
-
-    return res.status(400).json({
-      error: err.message || "Something went wrong",
-    });
-  }
-});
-
-adminRoute.get("/availabilities", async (_req, res) => {
-  try {
-    const availabilities = await getAllAvailabilities();
-    res.status(200).json(availabilities);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 adminRoute.get("/bookings", async (_req, res) => {
   try {
     const bookings = await getAllBookings();
@@ -256,14 +185,6 @@ adminRoute.get("/bookings", async (_req, res) => {
   }
 });
 
-adminRoute.get("/categories", async (_req, res) => {
-  try {
-    const categories = await getCategories();
-    res.status(200).json(categories);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
 
 adminRoute.delete("/delete-availability/:id", async (req, res) => {
   const { id } = req.params;
@@ -278,15 +199,6 @@ adminRoute.delete("/delete-availability/:id", async (req, res) => {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error deleting availability:", err);
     }
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-adminRoute.get("/booked-slots", async (_req, res) => {
-  try {
-    const bookedSlots = await getBookedSlots();
-    res.status(200).json(bookedSlots);
-  } catch (err) {
     res.status(500).send("Internal Server Error");
   }
 });

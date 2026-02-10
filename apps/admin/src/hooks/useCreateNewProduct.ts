@@ -17,12 +17,16 @@ const useCreateNewProduct = () => {
         formData.append('image', productData.image);
       }
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/add-product`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            // Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_ADMIN_API_URL}/add-product`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              // Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         return response.data;
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV !== 'production') {

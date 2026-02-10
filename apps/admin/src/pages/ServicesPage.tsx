@@ -9,14 +9,14 @@ import useDeleteService from '../hooks/useDeleteService';
 import { notifyError, notifySuccess } from '@salon/ui';
 import Loading from '../components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const ServicesPage = () => {
   const globalContext = useContext(GlobalContext);
   const [serviceIdToDelete, setServiceIdToDelete] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { data: services, isLoading, isError, refetch } = useServices(apiUrl);
+  const { data: services, isLoading, isError, refetch } = useServices(sharedApiUrl);
   const { mutate: deleteProduct } = useDeleteService();
   const handleDeleteService = (id: string) => {
     setServiceIdToDelete(id);

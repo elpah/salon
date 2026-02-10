@@ -11,7 +11,7 @@ const useCreateNewCategory = () => {
       //   const token = await user.getIdToken();
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/create-new-category`,
+          `${import.meta.env.VITE_ADMIN_API_URL}/create-new-category`,
           { name, type },
           {
             headers: {

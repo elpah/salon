@@ -8,7 +8,7 @@ import useDeleteCategory, { type CategoryPayload } from '../hooks/useDeleteCateg
 import { notifyError, notifySuccess } from '@salon/ui';
 import Loading from '../components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const CategoryPage = () => {
   const globalContext = useContext(GlobalContext);
@@ -20,7 +20,7 @@ const CategoryPage = () => {
     isLoading: categoriesIsLoading,
     isError: categoriesIsError,
     refetch,
-  } = useGetCategories(apiUrl);
+  } = useGetCategories(sharedApiUrl);
 
   const displayCategories =
     activeTab === 'product' ? categories?.shopCategories : categories?.serviceCategories;

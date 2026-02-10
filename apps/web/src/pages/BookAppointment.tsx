@@ -1,6 +1,5 @@
 import useCreateNewBooking from '@/hooks/useCreateNewBooking';
-import useGetAvailabilities from '@/hooks/useGetAvailabilities';
-import { useServices, useGetBookedSlots } from '@salon/hooks';
+import { useServices, useGetBookedSlots, useGetAvailabilities } from '@salon/hooks';
 import {
   AvailabilityWindow,
   BookedSlot,
@@ -16,7 +15,7 @@ import { notifyError } from '@salon/ui';
 import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/Loading';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 type ClientField = keyof BookingType['clientDetails'];
 
@@ -60,10 +59,11 @@ const BookAppointment = () => {
   const { mutate, isPending } = useCreateNewBooking();
   const navigate = useNavigate();
 
-  const { data: services, isLoading } = useServices(apiUrl);
+  const { data: services, isLoading } = useServices(sharedApiUrl);
   const { data: availabilityWindow, isLoading: availabilityIsLoading } =
-    useGetAvailabilities(apiUrl);
-  const { data: bookedSlots, isLoading: bookedSlotsIsLoading } = useGetBookedSlots(apiUrl);
+    useGetAvailabilities(sharedApiUrl);
+
+  const { data: bookedSlots, isLoading: bookedSlotsIsLoading } = useGetBookedSlots(sharedApiUrl);
 
   if (isLoading || availabilityIsLoading || bookedSlotsIsLoading) {
     return <Loading />;

@@ -8,7 +8,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import useCreateNewService from '../hooks/useCreateNewService';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useGetCategories } from '@salon/hooks';
-const apiUrl = import.meta.env.VITE_API_URL;
+
+const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const AddServicesModal = () => {
   const queryClient = useQueryClient();
@@ -19,7 +20,7 @@ const AddServicesModal = () => {
     data: categories,
     isLoading: categoriesIsLoading,
     isError: categoriesIsError,
-  } = useGetCategories(apiUrl);
+  } = useGetCategories(sharedApiUrl);
   const {
     data: serviceToAdd,
     setData: setServiceToAdd,
