@@ -21,7 +21,7 @@ const Sidebar = ({
   isOpen,
   onClose,
 }: {
-  currentPage: AdminPage;
+  currentPage: AdminPage | string;
   setPage: (p: AdminPage) => void;
   onLogout: () => void;
   isOpen: boolean;

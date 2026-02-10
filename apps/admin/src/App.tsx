@@ -1,27 +1,27 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { GlobalContext } from './context/GlobalContext';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { GlobalContext } from './context/GlobalContext';
 import Login from './pages/Login';
-import type { Product } from '@salon/types';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+
+const AdminLayout = lazy(() => import('./pages/AdminLayout'));
+const BookingsPage = lazy(() => import('./pages/BookingsPage'));
+const AvailabilityPage = lazy(() => import('./pages/AvailabilityPage'));
+const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+const ProductsPage = lazy(() => import('./pages/ProductsPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 
 function App() {
-  const [showAddSlotModal, setShowAddSlotModal] = useState<boolean>(false);
-  const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false);
-  const [showAddServicesModal, setShowAddServicesModal] = useState<boolean>(false);
-  const [showAddCategoryModal, setShowAddCategoryModal] = useState<boolean>(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [showAddSlotModal, setShowAddSlotModal] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showAddServicesModal, setShowAddServicesModal] = useState(false);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  }, [pathname]);
+  useEffect(() => window.scrollTo({ top: 0, behavior: 'smooth' }), [pathname]);
 
   return (
     <GlobalContext.Provider
@@ -30,14 +30,12 @@ function App() {
         setShowAddSlotModal,
         showAddProductModal,
         setShowAddProductModal,
-        products,
-        setProducts,
         showAddServicesModal,
         setShowAddServicesModal,
-        showConfirmationModal,
-        setShowConfirmationModal,
         showAddCategoryModal,
         setShowAddCategoryModal,
+        showConfirmationModal,
+        setShowConfirmationModal,
       }}
     >
       <div className="app-container">
@@ -45,7 +43,15 @@ function App() {
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route path="/" element={<Login />} />
-              <Route path="/dashboard" element={<AdminPage />} />
+              <Route path="/dashboard" element={<AdminLayout />}>
+                <Route index element={<BookingsPage />} />
+                <Route path="bookings" element={<BookingsPage />} />
+                <Route path="availability" element={<AvailabilityPage />} />
+                <Route path="orders" element={<OrdersPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route path="services" element={<ServicesPage />} />
+                <Route path="categories" element={<CategoryPage />} />
+              </Route>
             </Routes>
           </Suspense>
         </div>
@@ -58,9 +64,7 @@ function App() {
           pauseOnFocusLoss
           draggable={false}
           theme="colored"
-          toastStyle={{
-            fontSize: '14px',
-          }}
+          toastStyle={{ fontSize: '14px' }}
         />
       </div>
     </GlobalContext.Provider>
