@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Loading from '../components/Loading';
 import { useGetBookings } from '../hooks/useGetBookings';
 import type { BookingType } from '@salon/types';
@@ -34,7 +35,17 @@ const BookingsPage = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+    <motion.div
+      initial={{
+        opacity: 0,
+        scale: 0.9,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+      }}
+      className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto"
+    >
       <table className="w-full">
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr>
@@ -93,7 +104,7 @@ const BookingsPage = () => {
           ))}
         </tbody>
       </table>
-    </div>
+    </motion.div>
   );
 };
 

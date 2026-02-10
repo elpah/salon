@@ -25,11 +25,10 @@ const getProductById = async (id) => {
       { id },
       { projection: { _id: 0 } },
     );
-
     if (!product) {
       throw new Error("Product not found");
     }
-
+    
     return product;
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {

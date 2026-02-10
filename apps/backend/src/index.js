@@ -6,12 +6,10 @@ import sharedRoute from "./routes/sharedRoutes.js";
 import clientRoute from "./routes/clientRoutes.js";
 // import webhookRoute from "./routes/webhookRoute.js";
 
-
 dotenv.config();
 const app = express();
 // app.use("/webhook", webhookRoute);
 
-// CORS and JSON parsing for other routes
 app.use(cors());
 app.use(express.json());
 app.use("/admin/api/", adminRoute);

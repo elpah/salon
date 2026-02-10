@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { Menu, Plus } from 'lucide-react';
@@ -89,15 +89,9 @@ const AdminLayout = () => {
           )}
         </div>
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentPage}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+          <div key={currentPage}>
             <Outlet />
-          </motion.div>
+          </div>
         </AnimatePresence>
       </main>
     </div>

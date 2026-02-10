@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Package, Trash2 } from 'lucide-react';
 import { useContext, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
@@ -56,7 +56,15 @@ const ProductsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {products && products.length > 0 ? (
           products.map((product: Product) => (
-            <div
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
               key={product.id}
               className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all"
             >
@@ -85,7 +93,7 @@ const ProductsPage = () => {
                   }
                   <button
                     onClick={() => product.id && handleDeleteProduct(product.id)}
-                    className="text-red-600 hover:text-red-700 p-2"
+                    className="cursor-pointer text-red-600 hover:text-red-700 p-2"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -96,7 +104,7 @@ const ProductsPage = () => {
                   <p className="text-sm text-slate-500">Stock: {product.stock}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))
         ) : (
           <div className="text-center py-16 bg-slate-50 rounded-xl col-span-full">

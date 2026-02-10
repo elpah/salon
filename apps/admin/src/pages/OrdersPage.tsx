@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 interface Order {
@@ -49,45 +50,53 @@ const OrdersPage = () => {
   const [orders] = useState<Order[]>(MOCK_ORDERS);
 
   return (
-    <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {orders.map(order => (
-          <div
-            key={order.id}
-            className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-lg font-bold text-slate-900">{order.orderNumber}</p>
-                <p className="text-sm text-slate-500">{order.clientName}</p>
-                <p className="text-xs text-slate-400">{order.date}</p>
-              </div>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}
-              >
-                {order.status}
-              </span>
+    <motion.div
+      initial={{
+        opacity: 0,
+        scale: 0.9,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+      }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+    >
+      {orders.map(order => (
+        <div
+          key={order.id}
+          className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-lg font-bold text-slate-900">{order.orderNumber}</p>
+              <p className="text-sm text-slate-500">{order.clientName}</p>
+              <p className="text-xs text-slate-400">{order.date}</p>
             </div>
-            <div className="mb-4">
-              <p className="text-sm font-semibold text-slate-700 mb-2">Items:</p>
-              <ul className="space-y-1">
-                {order.items.map((item, idx) => (
-                  <li key={idx} className="text-sm text-slate-600">
-                    • {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-              <p className="text-lg font-bold text-slate-900">Total: €{order.total}</p>
-              <button className="text-rose-600 hover:text-rose-700 text-sm font-medium">
-                View Details
-              </button>
-            </div>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}
+            >
+              {order.status}
+            </span>
           </div>
-        ))}
-      </div>
-    </div>
+          <div className="mb-4">
+            <p className="text-sm font-semibold text-slate-700 mb-2">Items:</p>
+            <ul className="space-y-1">
+              {order.items.map((item, idx) => (
+                <li key={idx} className="text-sm text-slate-600">
+                  • {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+            <p className="text-lg font-bold text-slate-900">Total: €{order.total}</p>
+            <button className="text-rose-600 hover:text-rose-700 text-sm font-medium">
+              View Details
+            </button>
+          </div>
+        </div>
+      ))}
+    </motion.div>
   );
 };
 

@@ -30,8 +30,8 @@ const ShowModal = ({
             onClick={handleProceedClick}
             style={
               {
-                '--proceed-color': proceedColor || '#039fe2',
-                '--proceed-hover-color': proceedHoverColor || '#0ab5ff',
+                '--proceed-color': proceedColor || '#E11D48',
+                '--proceed-hover-color': proceedHoverColor || '#f71839ff',
               } as React.CSSProperties
             }
           >

@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Trash2, Briefcase } from 'lucide-react';
 import { useContext, useState } from 'react';
 import AddServicesModal from '../components/AddServicesModal';
@@ -50,7 +50,16 @@ const ServicesPage = () => {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{
+        opacity: 0,
+        scale: 0.9,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+      }}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {services?.map(service => (
           <div
@@ -116,7 +125,7 @@ const ServicesPage = () => {
       <AnimatePresence>
         {globalContext.showAddServicesModal && <AddServicesModal />}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
