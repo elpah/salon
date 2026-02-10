@@ -64,8 +64,6 @@ const deleteAvailabilityById = async (id) => {
   }
 };
 
-
-
 export {
   createAvailabilityWindow,
   deleteAvailabilityById,

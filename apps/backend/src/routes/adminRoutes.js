@@ -20,14 +20,14 @@ import {
   deleteAvailabilityById,
 } from "../services/admin-services/availability.services.js";
 
-import {
-  getAllBookings,
-} from "../services/admin-services/bookings.services.js";
+import { getAllBookings } from "../services/admin-services/bookings.services.js";
 
 import {
   createNewCategory,
   deleteCategory,
 } from "../services/admin-services/categories.services.js";
+
+import { getUser } from "../services/admin-services/user.services.js";
 
 const adminRoute = Router();
 const storage = multer.memoryStorage();
@@ -36,7 +36,6 @@ const upload = multer({ storage }).single("image");
 adminRoute.get("/", async (_req, res) => {
   res.status(200).json({ message: "arrived" });
 });
-
 
 adminRoute.delete("/delete-product/:id", async (req, res) => {
   const { id } = req.params;
@@ -185,7 +184,6 @@ adminRoute.get("/bookings", async (_req, res) => {
   }
 });
 
-
 adminRoute.delete("/delete-availability/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -292,6 +290,28 @@ adminRoute.delete("/delete-category", async (req, res) => {
     return res.status(400).json({
       error: err.message || "Something went wrong",
     });
+  }
+});
+
+adminRoute.get("/users/get-or-create", async (req, res) => {
+  try {
+    const { firebaseUid = "", email = "" } = req.query;
+    if (!firebaseUid || !email) {
+      return res
+        .status(400)
+        .json({ message: "firebaseUid and email are required" });
+    }
+
+    const user = await getUser(firebaseUid, email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 });
 

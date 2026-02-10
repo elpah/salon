@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Package, Briefcase, LogOut, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 
 type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services' | 'categories';
 
@@ -17,7 +19,6 @@ const menuItems: { id: AdminPage; icon: LucideIcon; label: string }[] = [
 const Sidebar = ({
   currentPage,
   setPage,
-  onLogout,
   isOpen,
   onClose,
 }: {
@@ -39,6 +40,15 @@ const Sidebar = ({
     setPage(page);
     if (isMobile) {
       onClose();
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // setPage();
+    } catch (error) {
+      console.error('Error signing out: ', error);
     }
   };
 
@@ -84,7 +94,7 @@ const Sidebar = ({
           })}
         </nav>
         <button
-          onClick={onLogout}
+          onClick={handleSignOut}
           className="cursor-pointer flex items-center px-6 py-4 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors border-t border-slate-800"
         >
           <LogOut className="h-5 w-5 mr-3" />

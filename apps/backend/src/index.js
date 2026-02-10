@@ -15,7 +15,6 @@ app.use(express.json());
 app.use("/admin/api/", adminRoute);
 app.use("/shared-route/api/", sharedRoute);
 app.use("/client/api/", clientRoute);
-
 app.get("/health", (_, res) => res.json({ ok: true }));
 
 app.listen(8000, () => console.log("Backend running on http://localhost:8000"));

@@ -1,13 +1,45 @@
 import { User } from 'lucide-react';
-import React, { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { GlobalContext } from '../context/GlobalContext';
+
+export type LoginInfo = {
+  username?: string;
+  email: string;
+  password: string;
+};
+
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const globalContext = useContext(GlobalContext);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const [loginInfo, setLoginInfo] = useState<LoginInfo>({
+    email: '',
+    password: '',
+  });
+
+  useEffect(() => {
+    if (!globalContext.authLoading && globalContext.authUser) {
+      navigate('/dashboard');
+    }
+  }, [globalContext.authUser, globalContext.authLoading, navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    // onLogin(email, password);
+    try {
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      await userCredentials.user.getIdToken();
+      navigate('/dashboard');
+    } catch (error) {
+      setErrorMessage('Invalid email of password');
+    }
   };
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
@@ -21,13 +53,7 @@ const Login = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSignIn} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
                 Email Address
@@ -35,8 +61,13 @@ const Login = () => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={loginInfo.email}
+                onChange={e =>
+                  setLoginInfo(prev => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
                 className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent transition-all outline-none"
                 placeholder="admin@salon.com"
                 required
@@ -50,8 +81,13 @@ const Login = () => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
+                value={loginInfo.password}
+                onChange={e =>
+                  setLoginInfo(prev => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                }
                 className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent transition-all outline-none"
                 placeholder="••••••••"
                 required
@@ -64,6 +100,7 @@ const Login = () => {
             >
               Sign In
             </button>
+            {errorMessage && <p className="text-rose-600 -mt-4">{errorMessage}</p>}
           </form>
         </div>
       </div>
