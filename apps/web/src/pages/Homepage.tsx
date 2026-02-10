@@ -1,11 +1,25 @@
+import Loading from '@/components/Loading';
 import ServicesCard from '@/components/ServicesCard';
-import { SERVICES } from '@salon/data';
+import { useServices } from '@salon/hooks';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, Star, CheckCircle, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const Homepage = () => {
   const navigate = useNavigate();
+  const { data: services, isLoading, isError } = useServices(apiUrl);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (isError) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load products. Please try again.</p>
+      </div>
+    );
+  }
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -78,24 +92,26 @@ const Homepage = () => {
             </div>
             <button
               onClick={() => navigate('/services')}
-              className="cursor-pointer mt-6 md:mt-0 flex items-center text-rose-600 font-bold hover:text-rose-700 transition-colors"
+              className=" cursor-pointer mt-6 md:mt-0 flex items-center text-rose-600 font-bold hover:text-rose-700 transition-colors"
             >
               View Full Menu <ArrowRight className="ml-2 h-4 w-4" />
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {SERVICES.slice(0, 3).map((service, idx) => (
-              <ServicesCard
-                key={idx}
-                id={service.id}
-                idx={idx}
-                image={service.image}
-                name={service.name}
-                price={service.price}
-                description={service.description}
-              />
-            ))}
+            {services
+              ?.slice(0, 3)
+              .map((service, idx) => (
+                <ServicesCard
+                  key={idx}
+                  id={service.id}
+                  idx={idx}
+                  image={service.image as string}
+                  name={service.name}
+                  price={service.price}
+                  description={service.description}
+                />
+              ))}
           </div>
         </div>
       </section>
@@ -149,7 +165,7 @@ const Homepage = () => {
               </ul>
               <button
                 onClick={() => navigate('/shop')}
-                className="px-8 py-4 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all inline-flex items-center"
+                className="cursor-pointer px-8 py-4 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all inline-flex items-center"
               >
                 Explore Boutique <ShoppingBag className="ml-2 h-5 w-5" />
               </button>

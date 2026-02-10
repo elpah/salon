@@ -2,6 +2,7 @@ import { Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetCategories, useServices } from '@salon/hooks';
+import Loading from '@/components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -17,11 +18,7 @@ const Services = () => {
   } = useGetCategories(apiUrl);
 
   if (isLoading || categoriesIsLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading products...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError || categoriesIsError) {
     return (

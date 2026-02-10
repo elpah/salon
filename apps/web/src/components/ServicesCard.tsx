@@ -26,7 +26,7 @@ const ServicesCard = ({ id, idx, image, name, price, description }: ServicesCard
       transition={{
         delay: idx * 0.1,
       }}
-      className="group cursor-pointer"
+      className="group"
     >
       <div className="relative overflow-hidden rounded-2xl aspect-4/5 mb-6">
         <img
