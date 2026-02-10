@@ -7,6 +7,7 @@ import { useServices } from '@salon/hooks';
 import ShowModal from '../components/modal/ShowModal';
 import useDeleteService from '../hooks/useDeleteService';
 import { notifyError, notifySuccess } from '@salon/ui';
+import Loading from '../components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -38,11 +39,7 @@ const ServicesPage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading Services...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError) {
     return (

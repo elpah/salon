@@ -14,6 +14,7 @@ import { CheckCircle, Home } from 'lucide-react';
 import { useReducer, useState } from 'react';
 import { notifyError } from '@salon/ui';
 import { useNavigate } from 'react-router-dom';
+import Loading from '@/components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -59,13 +60,13 @@ const BookAppointment = () => {
   const { mutate, isPending } = useCreateNewBooking();
   const navigate = useNavigate();
 
-  const { data: services, isLoading, isError } = useServices(apiUrl);
+  const { data: services, isLoading } = useServices(apiUrl);
   const { data: availabilityWindow, isLoading: availabilityIsLoading } =
     useGetAvailabilities(apiUrl);
   const { data: bookedSlots, isLoading: bookedSlotsIsLoading } = useGetBookedSlots(apiUrl);
 
   if (isLoading || availabilityIsLoading || bookedSlotsIsLoading) {
-    return <p className="text-center py-16 text-slate-500">Loading...</p>;
+    return <Loading />;
   }
 
   const pad = (n: number) => n.toString().padStart(2, '0');
@@ -156,7 +157,6 @@ const BookAppointment = () => {
       mutate(newBooking, {
         onSuccess: () => {
           setStep(5);
-          // dispatch({ type: 'RESET' });
         },
         onError: err => {
           notifyError('Something went wrong while submitting.');
@@ -477,14 +477,13 @@ const BookAppointment = () => {
                       Back
                     </button>
                     <button
+                      disabled={isPending}
                       onClick={() => {
                         createNewBooking();
-                        // console.log(state);
-                        // alert('Booking Successful! You will receive a confirmation email shortly.');
                       }}
                       className=" cursor-pointer  flex-1 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20"
                     >
-                      Complete Booking
+                      {isPending ? 'Booking...' : 'Complete Booking'}
                     </button>
                   </div>
                 </div>

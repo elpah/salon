@@ -8,6 +8,7 @@ import type { Product } from '@salon/types';
 import useDeleteProduct from '../hooks/useDeleteProduct';
 import ShowModal from '../components/modal/ShowModal';
 import { notifyError, notifySuccess } from '@salon/ui';
+import Loading from '../components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const ProductsPage = () => {
@@ -39,11 +40,7 @@ const ProductsPage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading products...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError) {
     return (

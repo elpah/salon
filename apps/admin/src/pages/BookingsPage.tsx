@@ -1,3 +1,4 @@
+import Loading from '../components/Loading';
 import { useGetBookings } from '../hooks/useGetBookings';
 import type { BookingType } from '@salon/types';
 
@@ -22,11 +23,7 @@ const BookingsPage = () => {
   // };
 
   if (isLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading products...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError) {
     return (

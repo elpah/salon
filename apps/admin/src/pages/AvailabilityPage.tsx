@@ -8,6 +8,7 @@ import useDeleteAvailability from '../hooks/useDeleteAvailability';
 import ShowModal from '../components/modal/ShowModal';
 import type { AvailabilityWindow } from '@salon/types';
 import { notifyError, notifySuccess } from '@salon/ui';
+import Loading from '../components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -38,11 +39,7 @@ const AvailabilityPage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading products...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError) {
     return (

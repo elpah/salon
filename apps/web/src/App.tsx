@@ -63,6 +63,7 @@ function App() {
               <Route path="/book-appointment" element={<BookAppointment />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="*" element={<ErrorPage />} />
             </Routes>
           </Suspense>
         </div>

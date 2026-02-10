@@ -6,6 +6,7 @@ import AddCategoryModal from '../components/AddCategoryModal';
 import { useGetCategories } from '@salon/hooks';
 import useDeleteCategory, { type CategoryPayload } from '../hooks/useDeleteCategory';
 import { notifyError, notifySuccess } from '@salon/ui';
+import Loading from '../components/Loading';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -39,11 +40,7 @@ const CategoryPage = () => {
     );
   };
   if (categoriesIsLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading Categories...</p>
-      </div>
-    );
+    return <Loading />;
   }
   if (categoriesIsError) {
     return (

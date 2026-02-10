@@ -4,6 +4,7 @@ import { GlobalContext } from './context/GlobalContext';
 import Login from './pages/Login';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from './components/Loading';
 
 const AdminLayout = lazy(() => import('./pages/AdminLayout'));
 const BookingsPage = lazy(() => import('./pages/BookingsPage'));
@@ -40,7 +41,7 @@ function App() {
     >
       <div className="app-container">
         <div className="content">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<AdminLayout />}>

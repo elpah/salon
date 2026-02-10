@@ -45,13 +45,7 @@ const AddServicesModal = () => {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
     };
   }, [imagePreview]);
-  if (categoriesIsLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading Categories...</p>
-      </div>
-    );
-  }
+
   if (categoriesIsError) {
     return (
       <div className="text-center py-16">
@@ -166,25 +160,29 @@ const AddServicesModal = () => {
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
-            <select
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-              name="category "
-              id="category"
-              value={serviceToAdd.category}
-              onChange={e =>
-                setServiceToAdd({
-                  ...serviceToAdd,
-                  category: e.target.value,
-                })
-              }
-            >
-              <option value="" disabled>
-                Select Category
-              </option>
-              {categories?.serviceCategories.map((cat, index) => (
-                <option key={index}>{cat}</option>
-              ))}
-            </select>
+            {categoriesIsLoading ? (
+              <p className=" px-4 py-3 border rounded-lg text-rose-600">Loading categories...</p>
+            ) : (
+              <select
+                className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                name="category "
+                id="category"
+                value={serviceToAdd.category}
+                onChange={e =>
+                  setServiceToAdd({
+                    ...serviceToAdd,
+                    category: e.target.value,
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Select Category
+                </option>
+                {categories?.serviceCategories.map((cat, index) => (
+                  <option key={index}>{cat}</option>
+                ))}
+              </select>
+            )}
             {error && !serviceToAdd.category && (
               <p className="text-sm text-red-600">Select a category</p>
             )}

@@ -43,13 +43,7 @@ const AddProductModal = () => {
   useEffect(() => {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
   }, [imagePreview]);
-  if (categoriesIsLoading) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Loading Categories...</p>
-      </div>
-    );
-  }
+
   if (categoriesIsError) {
     return (
       <div className="text-center py-16">
@@ -57,7 +51,6 @@ const AddProductModal = () => {
       </div>
     );
   }
-
   const handleAddProduct = () => {
     if (
       newProduct.name &&
@@ -154,23 +147,27 @@ const AddProductModal = () => {
 
           <div className="w-full">
             <label className=" text-sm font-semibold text-slate-700 mb-2">Category</label>
-            <select
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
-              name="category"
-              id="category"
-              value={newProduct.category}
-              onChange={e =>
-                setNewProduct({
-                  ...newProduct,
-                  category: e.target.value,
-                })
-              }
-            >
-              <option value="" disabled>
-                Select Category
-              </option>
-              {categories?.shopCategories.map((cat, index) => <option key={index}>{cat}</option>)}
-            </select>
+            {categoriesIsLoading ? (
+              <p className=" px-4 py-3 border rounded-lg text-rose-600">Loading categories...</p>
+            ) : (
+              <select
+                className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-600 focus:border-transparent outline-none"
+                name="category"
+                id="category"
+                value={newProduct.category}
+                onChange={e =>
+                  setNewProduct({
+                    ...newProduct,
+                    category: e.target.value,
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Select Category
+                </option>
+                {categories?.shopCategories.map((cat, index) => <option key={index}>{cat}</option>)}
+              </select>
+            )}
             {error && !newProduct.category && (
               <p className="text-sm text-red-600">Select a category</p>
             )}
