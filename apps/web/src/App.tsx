@@ -6,6 +6,7 @@ import Homepage from './pages/Homepage';
 import Footer from './components/Footer';
 import { GlobalContext } from './context/GlobalContext';
 import { Product } from '@salon/types';
+import NotFound from './pages/NotFound';
 const About = lazy(() => import('./pages/About'));
 const Services = lazy(() => import('./pages/Services'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -63,7 +64,7 @@ function App() {
               <Route path="/book-appointment" element={<BookAppointment />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="*" element={<ErrorPage />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </div>
