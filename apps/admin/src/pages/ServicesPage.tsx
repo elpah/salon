@@ -88,7 +88,7 @@ const ServicesPage = () => {
               </div>
               <p className="text-sm text-slate-600 mb-4">{service.description}</p>
               <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <p className="text-xl font-bold text-rose-600">${service.price}</p>
+                <p className="text-xl font-bold text-rose-600">€{service.price}</p>
                 <p className="text-sm text-slate-500">{service.duration}</p>
               </div>
             </div>

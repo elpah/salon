@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, Package, Briefcase, LogOut, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services'|'categories';
+type AdminPage = 'bookings' | 'availability' | 'orders' | 'products' | 'services' | 'categories';
 
 const menuItems: { id: AdminPage; icon: LucideIcon; label: string }[] = [
   { id: 'bookings', icon: Calendar, label: 'Bookings' },
@@ -11,8 +11,7 @@ const menuItems: { id: AdminPage; icon: LucideIcon; label: string }[] = [
   { id: 'orders', icon: Package, label: 'Orders' },
   { id: 'products', icon: Package, label: 'Products' },
   { id: 'services', icon: Briefcase, label: 'Services' },
-    { id: 'categories', icon: Briefcase, label: 'Categories' },
-
+  { id: 'categories', icon: Briefcase, label: 'Categories' },
 ];
 
 const Sidebar = ({

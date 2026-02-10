@@ -94,7 +94,7 @@ const ProductsPage = () => {
                 </div>
                 <p className="text-sm text-slate-600 mb-4">{product.description}</p>
                 <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                  <p className="text-xl font-bold text-rose-600">${product.price}</p>
+                  <p className="text-xl font-bold text-rose-600">€{product.price}</p>
                   <p className="text-sm text-slate-500">Stock: {product.stock}</p>
                 </div>
               </div>

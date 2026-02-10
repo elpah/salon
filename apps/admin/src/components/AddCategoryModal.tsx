@@ -22,7 +22,7 @@ const AddCategoryModal = () => {
       mutate(newCategory, {
         onSuccess: () => {
           notifySuccess('Category Successfully Added');
-          queryClient.invalidateQueries({ queryKey: ['products'] });
+          queryClient.invalidateQueries({ queryKey: ['categories'] });
           setNewCategory({
             name: '',
             type: 'product',

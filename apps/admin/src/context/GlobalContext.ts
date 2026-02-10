@@ -12,8 +12,8 @@ export interface IGlobalContext {
   setShowAddServicesModal: React.Dispatch<React.SetStateAction<boolean>>;
   showConfirmationModal: boolean;
   setShowConfirmationModal: React.Dispatch<React.SetStateAction<boolean>>;
-  showAddCategoryModal:boolean;
-  setShowAddCategoryModal:React.Dispatch<React.SetStateAction<boolean>>;
+  showAddCategoryModal: boolean;
+  setShowAddCategoryModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const GlobalContext = createContext<IGlobalContext>({
@@ -28,5 +28,5 @@ export const GlobalContext = createContext<IGlobalContext>({
   showConfirmationModal: false,
   setShowConfirmationModal: () => {},
   showAddCategoryModal: false,
-  setShowAddCategoryModal:() => {},
+  setShowAddCategoryModal: () => {},
 });

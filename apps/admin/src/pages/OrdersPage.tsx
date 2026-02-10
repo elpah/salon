@@ -79,7 +79,7 @@ const OrdersPage = () => {
               </ul>
             </div>
             <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-              <p className="text-lg font-bold text-slate-900">Total: ${order.total}</p>
+              <p className="text-lg font-bold text-slate-900">Total: €{order.total}</p>
               <button className="text-rose-600 hover:text-rose-700 text-sm font-medium">
                 View Details
               </button>

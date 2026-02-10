@@ -31,8 +31,11 @@ import {
   getAllBookings,
 } from "../services/admin-services/bookings.services.js";
 
-import {getCategories}
-from "../services/admin-services/categories.services.js"
+import {
+  getCategories,
+  createNewCategory,
+  deleteCategory,
+} from "../services/admin-services/categories.services.js";
 
 const adminRoute = Router();
 const storage = multer.memoryStorage();
@@ -162,7 +165,7 @@ adminRoute.delete("/delete-service/:id", async (req, res) => {
 //       });
 //     }
 
-//     return res.status(200).json({
+//     return res.status(201).json({
 //       message: "Product restored successfully",
 //     });
 //   } catch (err) {
@@ -188,7 +191,7 @@ adminRoute.delete("/delete-service/:id", async (req, res) => {
 //       });
 //     }
 
-//     return res.status(200).json({
+//     return res.status(201).json({
 //       message: "Service restored successfully",
 //     });
 //   } catch (err) {
@@ -305,7 +308,6 @@ adminRoute.post("/create-new-service", upload, async (req, res) => {
       newService.public_id = uploaded.public_id;
     }
     const insertedId = await addNewService(newService);
-    console.log();
     return res.status(201).json({
       message: "Service created successfully",
       id: insertedId,
@@ -339,7 +341,7 @@ adminRoute.post("/add-product", upload, async (req, res) => {
     if (!result) {
       return res.status(500).json({ message: "Failed to add product" });
     }
-    res.status(200).json({ message: "Product added successfully" });
+    res.status(201).json({ message: "Product added successfully" });
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
@@ -347,4 +349,38 @@ adminRoute.post("/add-product", upload, async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
+adminRoute.post("/create-new-category", async (req, res) => {
+  try {
+    const { name, type } = req.body;
+    console.log(name, type);
+    await createNewCategory({ name, type });
+    return res.status(201).json({
+      message: "Category created successfully",
+    });
+  } catch (err) {
+    console.error("Error in /create-new-category:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+adminRoute.delete("/delete-category", async (req, res) => {
+  try {
+    const { name, type } = req.query;
+    console.log(name, type);
+    await deleteCategory({ name, type });
+    return res.status(200).json({
+      message: "Category created successfully",
+    });
+  } catch (err) {
+    console.error("Error in /delete-category:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Something went wrong",
+    });
+  }
+});
+
 export default adminRoute;
