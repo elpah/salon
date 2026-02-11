@@ -8,15 +8,15 @@ export type CategoryPayload = {
 };
 
 const deleteCategory = async ({ name, type }: CategoryPayload) => {
-    const user = auth.currentUser;
-    if (!user) throw new Error('User not logged in');
+  const user = auth.currentUser;
+  if (!user) throw new Error('User not logged in');
 
-    const token = await user.getIdToken();
+  const token = await user.getIdToken();
 
   const response = await axios.delete(`${import.meta.env.VITE_ADMIN_API_URL}/delete-category/`, {
     params: { name, type },
     headers: {
-        Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 

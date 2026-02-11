@@ -6,10 +6,10 @@ import type { Product } from '@salon/types';
 const useCreateNewProduct = () => {
   return useMutation({
     mutationFn: async (productData: Product) => {
-        const user = auth.currentUser;
-        if (!user) throw new Error('User not logged in');
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not logged in');
 
-        const token = await user.getIdToken();
+      const token = await user.getIdToken();
 
       const formData = new FormData();
       formData.append('productData', JSON.stringify(productData));

@@ -3,14 +3,13 @@ import axios from 'axios';
 import type { Service } from '@salon/types';
 import { auth } from '../firebase.ts';
 
-
 const useCreateNewService = () => {
   return useMutation({
     mutationFn: async (newService: Service) => {
-        const user = auth.currentUser;
-        if (!user) throw new Error("User not logged in");
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not logged in');
 
-        const token = await user.getIdToken();
+      const token = await user.getIdToken();
       const formData = new FormData();
       formData.append('newService', JSON.stringify(newService));
       if (newService.image) {
@@ -23,7 +22,7 @@ const useCreateNewService = () => {
           {
             headers: {
               'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );

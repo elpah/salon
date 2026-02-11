@@ -6,17 +6,17 @@ import { auth } from '../firebase.ts';
 const useCreateNewAvailability = () => {
   return useMutation({
     mutationFn: async (newSlot: AvailabilityWindow) => {
-        const user = auth.currentUser;
-        if (!user) throw new Error("User not logged in");
+      const user = auth.currentUser;
+      if (!user) throw new Error('User not logged in');
 
-        const token = await user.getIdToken();
+      const token = await user.getIdToken();
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_ADMIN_API_URL}/create-new-availability`,
           newSlot,
           {
             headers: {
-                Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );

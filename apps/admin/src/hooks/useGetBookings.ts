@@ -32,7 +32,7 @@ export const useGetBookings = (apiUrl: string): GetBookingResult => {
     queryKey: ['bookings', apiUrl],
     queryFn: () => fetchBookings({ apiUrl }),
     enabled: !!apiUrl && !!auth.currentUser,
-    staleTime: 60 * 1000, 
-    retry: 1, 
+    staleTime: 60 * 1000,
+    retry: 1,
   });
 };

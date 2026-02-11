@@ -108,7 +108,7 @@ const Shop = () => {
                 onClick={() => {
                   globalContext.setCart(prev => addToCart(prev, product));
                 }}
-                className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-rose-600 transition-all"
+                className="cursor-pointer w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-rose-600 transition-all"
               >
                 Add to Cart
               </button>
