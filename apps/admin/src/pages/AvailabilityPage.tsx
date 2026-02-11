@@ -78,7 +78,7 @@ const AvailabilityPage = () => {
               </div>
               <button
                 onClick={() => handleDeleteAvailability(slot.id)}
-                className="text-red-600 hover:text-red-700 p-2"
+                className="cursor-pointer text-red-600 hover:text-red-700 p-2"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

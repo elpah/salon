@@ -1,15 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-// import { auth } from '../firebase.ts';
+import { auth } from '../firebase.ts';
 import type { Product } from '@salon/types';
 
 const useCreateNewProduct = () => {
   return useMutation({
     mutationFn: async (productData: Product) => {
-      //   const user = auth.currentUser;
-      //   if (!user) throw new Error('User not logged in');
+        const user = auth.currentUser;
+        if (!user) throw new Error('User not logged in');
 
-      //   const token = await user.getIdToken();
+        const token = await user.getIdToken();
 
       const formData = new FormData();
       formData.append('productData', JSON.stringify(productData));
@@ -23,7 +23,7 @@ const useCreateNewProduct = () => {
           {
             headers: {
               'Content-Type': 'multipart/form-data',
-              // Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );

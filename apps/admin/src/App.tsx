@@ -48,7 +48,7 @@ function App() {
       if (auth.currentUser) {
         signOut(auth)
           .then(() => console.log('User logged out due to inactivity'))
-          .catch(err => console.error(err));
+          .catch((error:unknown) => console.error(error));
         navigate('/login');
       }
     }, INACTIVITY_LIMIT);

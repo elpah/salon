@@ -29,7 +29,7 @@ const BookingsPage = () => {
   if (isError) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500">Failed to load products. Please try again.</p>
+        <p className="text-red-500">Failed to load bookings. Please try again.</p>
       </div>
     );
   }

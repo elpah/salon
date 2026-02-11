@@ -1,20 +1,38 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import type { BookingType, GetBookingResult } from '@salon/types';
+import { auth } from '../firebase.ts';
 
-const fetchBookings = async (apiUrl: string): Promise<BookingType[]> => {
+interface FetchBookingsOptions {
+  apiUrl: string;
+}
+const fetchBookings = async ({ apiUrl }: FetchBookingsOptions): Promise<BookingType[]> => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not logged in');
+  }
+  const token = await user.getIdToken();
   if (!apiUrl) {
     throw new Error('API URL is not defined');
   }
-  const res = await axios.get<BookingType[]>(`${apiUrl}/bookings`);
-  return res.data;
+  try {
+    const res = await axios.get<BookingType[]>(`${apiUrl}/bookings`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.data;
+  } catch (err: unknown) {
+    throw new Error('Failed to fetch bookings');
+  }
 };
 export const useGetBookings = (apiUrl: string): GetBookingResult => {
   return useQuery<BookingType[], Error>({
     queryKey: ['bookings', apiUrl],
-    queryFn: () => fetchBookings(apiUrl),
-    enabled: !!apiUrl,
-    staleTime: 60 * 1000,
-    retry: 1,
+    queryFn: () => fetchBookings({ apiUrl }),
+    enabled: !!apiUrl && !!auth.currentUser,
+    staleTime: 60 * 1000, 
+    retry: 1, 
   });
 };
