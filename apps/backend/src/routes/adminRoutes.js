@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { uploadImage } from "../services/admin-services/cloudinary.services.js";
+import { verifyAdmin } from "../middleware/auth.middleware.js";
 
 import {
   addNewProduct,
@@ -33,11 +34,11 @@ const adminRoute = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage }).single("image");
 
-adminRoute.get("/", async (_req, res) => {
+adminRoute.get("/", verifyAdmin, async (_req, res) => {
   res.status(200).json({ message: "arrived" });
 });
 
-adminRoute.delete("/delete-product/:id", async (req, res) => {
+adminRoute.delete("/delete-product/:id", verifyAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await deleteProductById(id);
@@ -54,7 +55,7 @@ adminRoute.delete("/delete-product/:id", async (req, res) => {
   }
 });
 
-adminRoute.delete("/delete-service/:id", async (req, res) => {
+adminRoute.delete("/delete-service/:id",verifyAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await deleteServiceById(id);
@@ -159,7 +160,7 @@ adminRoute.delete("/delete-service/:id", async (req, res) => {
 //   }
 // });
 
-adminRoute.post("/create-new-availability", async (req, res) => {
+adminRoute.post("/create-new-availability",verifyAdmin, async (req, res) => {
   try {
     const insertedId = await createAvailabilityWindow(req.body);
     return res.status(201).json({
@@ -175,7 +176,7 @@ adminRoute.post("/create-new-availability", async (req, res) => {
   }
 });
 
-adminRoute.get("/bookings", async (_req, res) => {
+adminRoute.get("/bookings",verifyAdmin, async (_req, res) => {
   try {
     const bookings = await getAllBookings();
     res.status(200).json(bookings);
@@ -184,7 +185,7 @@ adminRoute.get("/bookings", async (_req, res) => {
   }
 });
 
-adminRoute.delete("/delete-availability/:id", async (req, res) => {
+adminRoute.delete("/delete-availability/:id",verifyAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await deleteAvailabilityById(id);
@@ -201,7 +202,7 @@ adminRoute.delete("/delete-availability/:id", async (req, res) => {
   }
 });
 
-adminRoute.post("/create-new-service", upload, async (req, res) => {
+adminRoute.post("/create-new-service",verifyAdmin, upload, async (req, res) => {
   try {
     let newService = JSON.parse(req.body.newService);
     const serviceImage = req.file;
@@ -231,7 +232,7 @@ adminRoute.post("/create-new-service", upload, async (req, res) => {
   }
 });
 
-adminRoute.post("/add-product", upload, async (req, res) => {
+adminRoute.post("/add-product",verifyAdmin, upload, async (req, res) => {
   try {
     let productData = JSON.parse(req.body.productData);
     const productImage = req.file;
@@ -260,7 +261,7 @@ adminRoute.post("/add-product", upload, async (req, res) => {
   }
 });
 
-adminRoute.post("/create-new-category", async (req, res) => {
+adminRoute.post("/create-new-category",verifyAdmin, async (req, res) => {
   try {
     const { name, type } = req.body;
     console.log(name, type);
@@ -276,7 +277,7 @@ adminRoute.post("/create-new-category", async (req, res) => {
     });
   }
 });
-adminRoute.delete("/delete-category", async (req, res) => {
+adminRoute.delete("/delete-category",verifyAdmin, async (req, res) => {
   try {
     const { name, type } = req.query;
     console.log(name, type);
@@ -293,7 +294,7 @@ adminRoute.delete("/delete-category", async (req, res) => {
   }
 });
 
-adminRoute.get("/users/get-or-create", async (req, res) => {
+adminRoute.get("/users/get-or-create",verifyAdmin, async (req, res) => {
   try {
     const { firebaseUid = "", email = "" } = req.query;
     if (!firebaseUid || !email) {
