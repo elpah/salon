@@ -13,6 +13,7 @@ const sharedApiUrl = import.meta.env.VITE_SHARED_API_URL;
 
 const AddProductModal = () => {
   const globalContext = useContext(GlobalContext);
+  const { mutate, isPending } = useCreateNewProduct();
   const queryClient = useQueryClient();
   const [error, setError] = useState<boolean>(false);
 
@@ -40,9 +41,10 @@ const AddProductModal = () => {
     isError: categoriesIsError,
   } = useGetCategories(sharedApiUrl);
 
-  const { mutate, isPending } = useCreateNewProduct();
   useEffect(() => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
   }, [imagePreview]);
 
   if (categoriesIsError) {
